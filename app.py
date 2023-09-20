@@ -170,34 +170,38 @@ def login():
 
 ############################ API for signup page############################
 @app.route('/signup', methods=['POST'])
-
 def signup():
     request_data = request.json
-    regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')  
-  
-    email = request_data.get('email')
-    mobile = request_data.get('mobile')
-    if re.fullmatch(regex, email):  
-        print("The given mail is valid")  
-        if mobile and len(str(mobile)) == 10:
-            print("The mobile is valid")  
-            signup_result = signup_with_credentials(request_data)
-            print("signup_result:------------",signup_result['message'])
-            if signup_result['message'] == "User signup successfully" :
-                print("Yes:---------")
-                if request_data['mobile'] and request_data['email']:
-                    print("getting mobile:----",request_data['email'])
-                    mobile_sendotp(request_data)
-        
-                    print("getting email:----")
-                    email_sendotp1(request_data)
-        
-            return jsonify(signup_result)
-        else:
-            return jsonify({"status": "error", "message": "Invalid mobile number provided."})
-    else:  
-        print("The given mail is invalid")  
-        return jsonify({"status": "error", "message": "The given mail is invalid."})
+    try:
+        regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')  
+      
+        email = request_data.get('email')
+        mobile = request_data.get('mobile')
+    
+        if re.fullmatch(regex, email):  
+            print("The given mail is valid")  
+            if mobile and len(str(mobile)) == 10:
+                print("The mobile is valid")  
+                signup_result = signup_with_credentials(request_data)
+                print("signup_result:------------",signup_result['message'])
+                if signup_result['message'] == "User signup successfully" :
+                    print("Yes:---------")
+                    if request_data['mobile'] and request_data['email']:
+                        print("getting mobile:----",request_data['email'])
+                        mobile_sendotp(request_data)
+            
+                        print("getting email:----")
+                        email_sendotp1(request_data)
+            
+                return jsonify(signup_result)
+            else:
+                return jsonify({"status": "error", "message": "Invalid mobile number provided."})
+        else:  
+            print("The given mail is invalid")  
+            return jsonify({"status": "error", "message": "The given mail is invalid."})
+    except Exception as e:
+        print("ERROR_Ssingup:----",e)
+        return jsonify({"status": "error", "message": e})
 
 def mobile_sendotp(data):
     print("mobile:----",data.get('mobile'))
