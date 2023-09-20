@@ -1,0 +1,29 @@
+<!-- Store this code in 'signup.html' file inside the 'templates' folder -->
+
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title> User Signup Form </title>
+		<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">			
+	</head>
+	<body></br></br></br></br></br>
+		<div align="center">
+		<div align="center" class="border">
+			<div class="header">
+				<h2 class="word">User Sign Up</h2>
+			</div></br></br></br>
+			<h2 class="word">
+				<form action="{{ url_for('signup') }}" method="post">
+				<div class="msg">{{ msg }}</div>
+					<input id="first_name" name="first_name" type="text" placeholder="Enter First name" class="textbox"/></br></br>
+					<input id="last_name" name="last_name" type="text" placeholder="Enter Last name" class="textbox"/></br></br>
+					<input id="email" name="email" type="email" placeholder="Enter Email" class="textbox"/></br></br>
+					<input id="password" name="password" type="password" placeholder="Enter Password" class="textbox"/></br></br>
+					<input type="submit" class="btn" value="Sign Up"></br>
+				</form>
+			</h2>
+			<p class="bottom">Already have an account? <a class="bottom" href="{{url_for('login')}}"> Sign In here</a></p>
+		</div>
+		</div>
+	</body>
+</html>

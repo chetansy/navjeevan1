@@ -1,0 +1,51 @@
+profession,average_monthly_income,average_monthly_expense,existing_emi,emi_amount,industry,age_of_business,type_of_credit,required_credit_amount,cibil_score,neo_score,eligible_amount
+self-employed,280000,471000,no,0,Textiles,9,home loan,2026000,711,59,3747000
+self-employed,197000,454000,yes,42288,Food & agro-based products,11,personal,2872000,714,38,3439000
+salaried,443000,332000,yes,45459,Metals & metal products,14,personal,3951000,531,63,4663000
+self-employed,433000,497000,no,0,Construction materials,13,vehicle,2396000,513,39,491000
+self-employed,277000,402000,no,0,Textiles,6,vehicle,2777000,539,46,3662000
+self-employed,428000,111000,no,0,Consumer goods,13,education,3429000,522,51,3251000
+salaried,478000,103000,no,0,Food & agro-based products,7,personal,508000,613,49,4929000
+salaried,157000,300000,no,0,Textiles,7,personal,4146000,768,44,2198000
+salaried,41000,35000,no,0,Textiles,10,vehicle,4226000,537,50,1383000
+self-employed,265000,120000,yes,31013,Consumer goods,3,education,461000,700,61,1287000
+salaried,103000,432000,no,0,Metals & metal products,7,personal,1577000,612,40,44000
+self-employed,27000,494000,yes,10221,service,14,personal,4026000,693,47,1158000
+self-employed,78000,401000,yes,28475,Consumer goods,11,education,3694000,703,46,938000
+salaried,288000,219000,no,0,Textiles,6,home loan,3031000,625,36,1110000
+salaried,480000,45000,no,0,Food & agro-based products,10,personal,1864000,610,40,4200000
+self-employed,146000,263000,no,0,Food & agro-based products,15,vehicle,2384000,562,56,3729000
+self-employed,425000,239000,yes,30160,service,14,vehicle,4516000,718,49,1621000
+salaried,484000,88000,yes,18960,Textiles,3,personal,2131000,627,58,4981000
+self-employed,356000,216000,yes,30202,service,11,business,407000,660,60,3517000
+self-employed,493000,43000,no,0,Food & agro-based products,3,business,3568000,537,40,1570000
+salaried,421000,400000,no,0,Construction materials,9,home loan,2659000,519,61,1390000
+salaried,333000,435000,yes,39719,Metals & metal products,13,education,569000,647,62,2850000
+self-employed,485000,108000,yes,31253,Textiles,3,personal,4023000,551,37,612000
+self-employed,62000,476000,no,0,service,10,personal,1043000,666,62,1648000
+salaried,206000,69000,no,0,Food & agro-based products,15,home loan,3451000,662,44,1853000
+salaried,81000,304000,no,0,Construction materials,6,education,4645000,530,42,1583000
+salaried,109000,166000,yes,32428,Construction materials,5,business,4335000,755,42,231000
+self-employed,424000,273000,no,0,Food & agro-based products,5,home loan,676000,636,46,4512000
+self-employed,240000,245000,yes,10583,Metals & metal products,8,education,1123000,641,59,3230000
+salaried,54000,399000,no,0,Textiles,9,home loan,1369000,618,54,410000
+self-employed,499000,305000,yes,16788,Textiles,2,personal,1108000,776,45,302000
+self-employed,91000,381000,no,0,Textiles,15,vehicle,2883000,732,53,4854000
+self-employed,308000,434000,no,0,Metals & metal products,2,education,4589000,510,34,2844000
+salaried,244000,396000,no,0,Textiles,9,vehicle,2974000,537,50,1189000
+salaried,109000,263000,no,0,Metals & metal products,6,personal,230000,585,45,4605000
+self-employed,95000,100000,no,0,Textiles,10,personal,605000,655,54,3478000
+self-employed,118000,166000,no,0,Construction materials,2,education,4314000,570,34,3768000
+salaried,85000,213000,no,0,Chemicals & chemical products,11,home loan,4533000,591,60,389000
+salaried,261000,224000,yes,19564,Construction materials,15,business,2543000,755,54,2922000
+self-employed,429000,212000,yes,23720,Construction materials,8,education,4962000,644,60,2983000
+salaried,161000,108000,no,0,Food & agro-based products,2,business,2704000,527,33,2410000
+self-employed,217000,124000,yes,20848,Food & agro-based products,10,home loan,2193000,686,51,2770000
+self-employed,389000,45000,no,0,Construction materials,7,personal,3459000,543,59,1819000
+self-employed,181000,478000,yes,18143,service,3,home loan,1395000,641,32,2103000
+self-employed,500000,189000,no,0,Metals & metal products,14,personal,2545000,777,39,2502000
+salaried,114000,344000,yes,25821,Chemicals & chemical products,12,business,4367000,638,60,4040000
+salaried,482000,318000,no,0,Textiles,13,home loan,4271000,691,39,1714000
+salaried,457000,252000,no,0,Construction materials,11,business,1933000,595,54,1021000
+self-employed,143000,270000,yes,30989,Textiles,11,home loan,4799000,683,64,3710000
+salaried,244000,35000,yes,12789,Consumer goods,3,business,1975000,695,44,4958000

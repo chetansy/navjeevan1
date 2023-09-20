@@ -1,0 +1,28 @@
+<!-- Store this code in 'login.html' file inside the 'templates' folder -->
+
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title> User Login Form </title>
+		<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">		
+	</head>
+	<body></br></br></br></br></br>
+		<div align="center">
+		<div align="center" class="border">
+			<div class="header">
+				<h2 class="word">User Sign In</h2>
+			</div></br></br></br>
+			<h2 class="word">
+				<form action="{{ url_for('login') }}" method="post">
+				<div class="msg">{{ msg }}</div>
+					<input id="email" name="email" type="text" placeholder="Enter Registerd Email" class="textbox"/></br></br>
+					<input id="password" name="password" type="password" placeholder="Enter Registerd Password" class="textbox"/></br></br></br>
+					<input type="submit" class="btn" value="Sign In"></br></br>
+				</form>
+			</h2>
+			<p class="bottom">Don't have an account? <a class="bottom" href="{{url_for('signup')}}"> Sign Up here</a></p>
+		</div>
+		</div>
+	</body>
+</html>
+
