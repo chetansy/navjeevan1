@@ -121,6 +121,11 @@ def register_new_user(name, email, password):
         print(f"Error in register_new_user: {e}")
         return None
 
+##########################################################################
+@app.route('/', methods=['POST'])
+def index():
+	return 'Hello World'
+
 ############################ API for login page############################
 @app.route('/login', methods=['POST'])
 def login():
