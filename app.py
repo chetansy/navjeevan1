@@ -51,10 +51,10 @@ logging.basicConfig(level=logging.INFO)
 app.config['SESSION_TYPE'] = 'filesystem'
 
 
-DB_HOST = "localhost"
+DB_HOST = "dpg-ck5a6oeru70s739qi8ug-a"
 DB_NAME = "navjeevan_data"
-DB_USER = "postgres"
-DB_PASS = "1234"
+DB_USER = "navjeevan_data_user"
+DB_PASS = "263sRonJ5pLLli2OfSN6YzptaWucb2jb"
 DB_PORT = "5432"
 
 
