@@ -871,7 +871,7 @@ def save_customer_details2():
         industry  = data['industry']
         age_of_business  = data['age_of_business']
         type_of_credit  = data['type_of_credit']
-        required_credit_amount  = data['required_credit_amount']
+        required_credit_amount  = int(data['required_credit_amount'])
         
         print("existing_emi:-----",existing_emi)
         print("emi_amount:-----",emi_amount)
