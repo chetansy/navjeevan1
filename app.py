@@ -891,7 +891,7 @@ def save_customer_details2():
 	
         neo_score = randint(45, 65)
         #eligible_score = get_eligible_amount(email)
-        eligible_score = (required_credit_amount * (70/100))
+        eligible_score = int(required_credit_amount * (70/100))
         
         insert_query = """UPDATE eligibility_details SET neo_score = %s, eligible_amount = %s WHERE customer_id = %s"""
         values = (
