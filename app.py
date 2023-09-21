@@ -1265,14 +1265,16 @@ def get_score():
         customer_id = str(custo_id[0])
         print("customer_id:-----------",customer_id)
         
-        insert_query = """SELECT neo_score,eligible_amount FROM eligibility_details WHERE customer_id = %s"""
-        values = (customer_id)
+        #insert_query = """SELECT neo_score,eligible_amount FROM eligibility_details WHERE customer_id = %s"""
+        #values = (customer_id)
 
-        cursor.execute(insert_query, values)
-        conn.commit()
+	cur.execute( "SELECT neo_score,eligible_amount FROM eligibility_details WHERE customer_id = %s", [customer_id] )
+        #cursor.execute(insert_query, values)
+        
         neo = cursor.fetchone()
         neo_scor = neo[0]
         eligibl_scor = neo[1]
+	conn.commit()
         print("neo_score:----",neo_scor)
         
         return {"neo_scor": neo_scor, "eligibl_scor":eligibl_scor}
