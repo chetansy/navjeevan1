@@ -1267,7 +1267,6 @@ def get_score():
         
         #insert_query = """SELECT neo_score,eligible_amount FROM eligibility_details WHERE customer_id = %s"""
         #values = (customer_id)
-
 	cur.execute( "SELECT neo_score,eligible_amount FROM eligibility_details WHERE customer_id = %s", [customer_id] )
         #cursor.execute(insert_query, values)
         
