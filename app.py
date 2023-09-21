@@ -121,6 +121,147 @@ def register_new_user(name, email, password):
         print(f"Error in register_new_user: {e}")
         return None
 
+
+############################################################################################################
+
+
+def get_neo_score(email):
+    customer_id = request.json.get('customer_id')
+    print("test0")
+    cursor.execute(f'SELECT customer_id FROM customer_details WHERE email = %s', (email,))
+    custo_id = cursor.fetchone()
+    print("custo_id:--------------",custo_id[0])
+    # Query data from the customer_details and eligibility_details tables
+    cursor.execute(f'SELECT * FROM customer_details WHERE customer_id = %s', (customer_id,))
+    df_customer = pd.DataFrame(cursor.fetchall(), columns=[desc[0] for desc in cursor.description])
+    print("test1")
+    
+    cursor.execute(f'SELECT cibil_score FROM eligibility_details WHERE customer_id = %s', (customer_id,))
+    df_eligibility = pd.DataFrame(cursor.fetchall(), columns=['cibil_score'])
+    print("test2")
+
+    # Combine the data into a single DataFrame
+    df = pd.concat([df_customer, df_eligibility], axis=1)
+    df.fillna(0,inplace=True)
+    print(df)
+    print("test3")
+
+    # Drop unnecessary columns
+    df.drop(columns=['customer_id', 'pan', 'pan_status','required_credit_amount'], inplace=True)
+    print("test4")
+    
+   # Loading later
+    with open('neo_score/neo_score_model_and_transformers1.pkl', 'rb') as f:
+        saved_objects = pickle.load(f)
+    
+    model = saved_objects['model']
+    print("model:------",model)
+    encoder = saved_objects['encoder']
+    print("encoder:----",encoder)
+    scaler = saved_objects['scaler']
+    print("scaler:-------",scaler)
+        
+    # Define the categorical columns
+    categorical_columns = ['designation', 'existing_emi', 'type_of_credit', 'industry']
+
+    new_data = df
+  
+    # Apply one-hot encoding using the same encoder
+    #encoder = OneHotEncoder()
+    one_hot_encoded_new = encoder.transform(new_data[categorical_columns])
+    new_data = new_data.drop(categorical_columns, axis=1)
+    new_data = pd.concat([new_data, pd.DataFrame(one_hot_encoded_new.toarray(), columns=encoder.get_feature_names_out(categorical_columns))], axis=1)
+    
+    # Apply min-max scaling using the same scaler
+    #scaler = MinMaxScaler()
+    new_data[new_data.columns.difference(['neo_score'])] = scaler.transform(new_data[new_data.columns.difference(['neo_score'])])
+
+
+    df = new_data
+
+    # Change the datatype to int32
+    #df = df.astype(np.int32)
+    #print(df)
+    print("test6")
+
+
+    # Apply the model to the DataFrame
+    neo_score = model.predict(df)
+
+    # Store the output in the eligibility_details table
+    cursor.execute(f'UPDATE eligibility_details SET neo_score = %s WHERE customer_id = %s', (neo_score[0], customer_id))
+
+    #return jsonify({'neo_score': neo_score[0]})
+    return neo_score[0]
+
+def get_eligible_amount(email):
+    
+    customer_id = request.json.get('customer_id')
+    print("test0")
+    
+    cursor.execute(f'SELECT customer_id FROM customer_details WHERE email = %s', (email,))
+    custo_id = cursor.fetchone()
+    print("custo_id:--------------",custo_id[0])
+    # Query data from the customer_details and eligibility_details tables
+    cursor.execute(f'SELECT * FROM customer_details WHERE customer_id = %s', (customer_id,))
+    df_customer = pd.DataFrame(cursor.fetchall(), columns=[desc[0] for desc in cursor.description])
+    print("test1")
+    
+    cursor.execute(f'SELECT cibil_score,neo_score FROM eligibility_details WHERE customer_id = %s', (customer_id,))
+    df_eligibility = pd.DataFrame(cursor.fetchall(), columns=['cibil_score','neo_score'])
+    print("test2")
+
+    # Combine the data into a single DataFrame
+    df = pd.concat([df_customer, df_eligibility], axis=1)
+    #print(df)
+    print("test3")
+
+    # Drop unnecessary columns
+    df.drop(columns=['customer_id', 'pan', 'pan_status','required_credit_amount'], inplace=True)
+    print("test4")
+    
+   # Loading later
+    with open('neo_score/eligible_amount_model_and_transformers1.pkl', 'rb') as f:
+        saved_objects = pickle.load(f)
+    
+    model = saved_objects['model']
+    encoder = saved_objects['encoder']
+    scaler = saved_objects['scaler']
+        
+    # Define the categorical columns
+    categorical_columns = ['designation', 'existing_emi', 'type_of_credit', 'industry']
+
+    new_data = df
+    
+    
+    
+    # Apply one-hot encoding using the same encoder
+    #encoder = OneHotEncoder()
+    one_hot_encoded_new = encoder.transform(new_data[categorical_columns])
+    new_data = new_data.drop(categorical_columns, axis=1)
+    new_data = pd.concat([new_data, pd.DataFrame(one_hot_encoded_new.toarray(), columns=encoder.get_feature_names_out(categorical_columns))], axis=1)
+    
+    # Apply min-max scaling using the same scaler
+    #scaler = MinMaxScaler()
+    new_data[new_data.columns.difference(['eligible_amount'])] = scaler.transform(new_data[new_data.columns.difference(['eligible_amount'])])
+
+
+    df = new_data.fillna(0)
+
+    # Change the datatype to int32
+    #df = df.astype(np.int32)
+    #print(df)
+    print("test6")
+
+
+    # Apply the model to the DataFrame
+    eligible_amount = model.predict(df)
+
+    # Store the output in the eligibility_details table
+    cursor.execute(f'UPDATE eligibility_details SET eligible_amount = %s WHERE customer_id = %s', (eligible_amount[0], customer_id))
+
+    #return jsonify({'eligible_amount': eligible_amount[0]})
+    return eligible_amount[0]
 ##########################################################################
 @app.route('/', methods=['POST'])
 def index():
@@ -734,8 +875,11 @@ def save_customer_details2():
 
         cursor.execute(insert_query, values)
         conn.commit()
-
-        response = {"message": "Data saved successfully"}
+	
+	neo_score = get_neo_score(email)
+        eligible_score = get_eligible_amount(email)
+        response = {"message": "Data saved successfully","neo_score" : neo_score,"eligible_score" : eligible_score}
+        #response = {"message": "Data saved successfully"}
         return jsonify(response), 200
 
 
@@ -822,71 +966,6 @@ def generate_and_save_cibil_score():
 
 ########################### API for NEO SCORE ####################################
  
-@app.route('/neo-score', methods=['POST'])
-def get_neo_score():
-    customer_id = request.json.get('customer_id')
-    print("test0")
-
-    # Query data from the customer_details and eligibility_details tables
-    cursor.execute(f'SELECT * FROM customer_details WHERE customer_id = %s', (customer_id,))
-    df_customer = pd.DataFrame(cursor.fetchall(), columns=[desc[0] for desc in cursor.description])
-    print("test1")
-    
-    cursor.execute(f'SELECT cibil_score FROM eligibility_details WHERE customer_id = %s', (customer_id,))
-    df_eligibility = pd.DataFrame(cursor.fetchall(), columns=['cibil_score'])
-    print("test2")
-
-    # Combine the data into a single DataFrame
-    df = pd.concat([df_customer, df_eligibility], axis=1)
-    #print(df)
-    print("test3")
-
-    # Drop unnecessary columns
-    df.drop(columns=['customer_id', 'pan', 'pan_status','required_credit_amount'], inplace=True)
-    print("test4")
-    
-   # Loading later
-    with open('neo_score_model_and_transformers.pkl', 'rb') as f:
-        saved_objects = pickle.load(f)
-    
-    model = saved_objects['model']
-    encoder = saved_objects['encoder']
-    scaler = saved_objects['scaler']
-        
-    # Define the categorical columns
-    categorical_columns = ['profession', 'existing_emi', 'type_of_credit', 'industry']
-
-    
-    new_data = df
-    
-    
-    
-    # Apply one-hot encoding using the same encoder
-    #encoder = OneHotEncoder()
-    one_hot_encoded_new = encoder.transform(new_data[categorical_columns])
-    new_data = new_data.drop(categorical_columns, axis=1)
-    new_data = pd.concat([new_data, pd.DataFrame(one_hot_encoded_new.toarray(), columns=encoder.get_feature_names_out(categorical_columns))], axis=1)
-    
-    # Apply min-max scaling using the same scaler
-    #scaler = MinMaxScaler()
-    new_data[new_data.columns.difference(['neo_score'])] = scaler.transform(new_data[new_data.columns.difference(['neo_score'])])
-
-
-    df = new_data
-
-    # Change the datatype to int32
-    #df = df.astype(np.int32)
-    #print(df)
-    print("test6")
-
-
-    # Apply the model to the DataFrame
-    neo_score = model.predict(df)
-
-    # Store the output in the eligibility_details table
-    cursor.execute(f'UPDATE eligibility_details SET neo_score = %s WHERE customer_id = %s', (neo_score[0], customer_id))
-
-    return jsonify({'neo_score': neo_score[0]})
 
 
 
