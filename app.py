@@ -1127,7 +1127,7 @@ pdfkit_options = {
 
 
 #pdfkit_config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')
-#env = Environment(loader=FileSystemLoader('.'))
+env = Environment(loader=FileSystemLoader('.'))
 neo_report_template = env.get_template('neo_report.html')
 
 @app.route('/generate_pdf', methods=['GET'])
