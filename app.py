@@ -1262,11 +1262,11 @@ def get_score():
         ### Extracting customer_id from email ###
         cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
         custo_id = cursor.fetchone()
-        customer_id = custo_id[0]
+        customer_id = str(custo_id[0])
         print("customer_id:-----------",customer_id)
         
         insert_query = """SELECT neo_score,eligible_amount FROM eligibility_details WHERE customer_id = %s"""
-        values = str(customer_id)
+        values = (customer_id)
 
         cursor.execute(insert_query, values)
         conn.commit()
