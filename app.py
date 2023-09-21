@@ -27,6 +27,12 @@ from datetime import datetime,timedelta
 import json
 import pandas as pd
 import sklearn
+from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
+import pickle
+
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.metrics import mean_squared_error
 app = Flask(__name__)
 mail = Mail(app)
 
