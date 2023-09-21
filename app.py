@@ -1111,7 +1111,136 @@ def verify_email_otp(email, provided_email_otp):
         return jsonify({"status": "error", "message": "An unexpected error occurred."}), 500
         
     return jsonify({"status": "success", "message": "Email OTP verification successful."}), 200
+
+pdfkit_options = {
+    'page-size': 'A4',
+    'margin-top': '0mm',
+    'margin-right': '0mm',
+    'margin-bottom': '0mm',
+    'margin-left': '0mm',
+}
+
+
+#pdfkit_config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')
+env = Environment(loader=FileSystemLoader('.'))
+neo_report_template = env.get_template('neo_report.html')
+
+@app.route('/generate_pdf', methods=['GET'])
+def generate_pdf():
     
+    data = request.get_json()
+    email = data['email']
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
+    custo_id = cursor.fetchone()
+    customer_id = custo_id[0]
+    print("customer_id:-----------",customer_id)
+    
+    
+    cursor.execute("""
+        SELECT ld.customer_id, ld.name, ld.email, ld.mobile,
+               cd.pan, cd.designation, cd.average_monthly_income, cd.average_monthly_expense, cd.existing_emi, cd.emi_amount,
+               cd.industry, cd.age_of_business, cd.type_of_credit, cd.required_credit_amount,
+               ed.eligible_amount, ed.neo_score
+        FROM login_details ld
+        JOIN customer_details cd ON ld.customer_id = cd.customer_id
+        JOIN eligibility_details ed ON ld.customer_id = ed.customer_id
+        WHERE ld.customer_id = %s;
+    """, (customer_id,))
+    
+    data = cursor.fetchone()
+    
+    if not data:
+        return jsonify({'error': 'Customer ID not found'}), 404
+    
+    # Generate a PDF report using the retrieved data
+    html_content = """
+    <html>
+    <head>
+        <title>Customer NEO Report</title>
+    </head>
+    <body>
+        <h1>NEO Credit Assesment Report</h1>
+        <p><strong>Customer ID :</strong> {}</p>
+        <p><strong>Name :</strong> {}</p>
+        <p><strong>Email :</strong> {}</p>
+        <p><strong>Mobile :</strong> {}</p>
+        <p><strong>PAN :</strong> {}</p>
+        <p><strong>Designation :</strong> {}</p>
+        <p><strong>Average Monthly Income :</strong> {}</p>
+        <p><strong>Average Monthly Expense :</strong> {}</p>
+        <p><strong>Existing EMI :</strong> {}</p>
+        <p><strong>EMI Amount :</strong> {}</p>
+        <p><strong>Industry :</strong> {}</p>
+        <p><strong>Age of Business :</strong> {}</p>
+        <p><strong>Type of Credit :</strong> {}</p>
+        <p><strong>Required Credit Amount :</strong> {}</p>
+        
+        <p><strong>Eligible Amount :</strong> {}</p>
+        <p><strong>NEO Score :</strong> {}</p>
+    </body>
+    </html>
+    """.format(*data) 
+    
+    # Parse the HTML content
+    soup = BeautifulSoup(html_content, 'html.parser')
+    data_dict = {}
+    for p in soup.find_all('p'):
+        key = p.strong.text.strip()
+        value = p.contents[-1].strip()
+        data_dict[key] = value
+    
+    personal_details_keys = [
+        'Customer ID :',
+        'Name :',
+        'Email :',
+        'Mobile :',
+    ]
+    
+    other_details_keys = [
+        'PAN :',
+        'Designation :',
+        'Average Monthly Income :',
+        'Average Monthly Expense :',
+        'Existing EMI :',
+        'EMI Amount :',
+        'Industry :',
+        'Age of Business :',
+        'Type of Credit :',
+        'Required Credit Amount :',
+        'Required Tenure :',
+        'Eligible Amount :',
+        'NEO Score :',
+    ]
+    
+    personal_details_table = PrettyTable()
+    personal_details_table.field_names = []
+    
+    other_details_table = PrettyTable()
+    other_details_table.field_names = []
+    
+    for key in personal_details_keys:
+        value = data_dict.get(key, '')
+        personal_details_table.add_row([key, value])
+    personal_details_table.header = False
+        
+    for key in other_details_keys:
+        value = data_dict.get(key, '')
+        other_details_table.add_row([key, value])
+    other_details_table.header = False
+    
+    template_data = {
+        'personal_details_table': personal_details_table.get_html_string(),
+        'other_details_table': other_details_table.get_html_string(),
+    }
+
+    rendered_html = neo_report_template.render(data=template_data)   
+    pdf_filename = f'NEO_report_{re.sub(r"[^a-zA-Z0-9]", "_", str(customer_id))}.pdf'
+    #pdfkit.from_string(rendered_html, pdf_filename, configuration=pdfkit_config, options=pdfkit_options)
+    
+    return jsonify({'message': 'PDF report generated successfully', 'pdf_filename': pdf_filename}), 200
+
 if __name__ == '__main__':  
     app.run(debug=True) 
 
