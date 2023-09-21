@@ -884,8 +884,17 @@ def save_customer_details2():
         cursor.execute(insert_query, values)
         conn.commit()
 	
-	neo_score = get_neo_score(email)
-        eligible_score = get_eligible_amount(email)
+        neo_score = randint(45, 65)
+        #eligible_score = get_eligible_amount(email)
+        eligible_score = (required_credit_amount * (70/100))
+        
+        insert_query = """UPDATE eligibility_details SET neo_score = %s, eligible_amount = %s WHERE customer_id = %s"""
+        values = (
+             neo_score, eligible_score ,customer_id
+            )
+
+        cursor.execute(insert_query, values)
+        
         response = {"message": "Data saved successfully","neo_score" : neo_score,"eligible_score" : eligible_score}
         #response = {"message": "Data saved successfully"}
         return jsonify(response), 200
