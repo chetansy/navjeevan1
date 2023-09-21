@@ -698,13 +698,13 @@ def save_customer_details1():
 def save_customer_details2():
     #try:
         data = request.get_json()
-	email1 = data['email']
-	
+        email1 = data['email']
         print("email1:---------",email1)
-	try:
-        	email = email1["email"]
-	except Exception as e:
-		email = email1
+        try:
+            email = email1["email"]
+        except Exception as e:
+            print("in save_custmr_1:-----",e)
+            email = email1
         print("email:-----------",email)
         ### Extracting customer_id from email ###
         cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
