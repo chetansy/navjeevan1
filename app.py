@@ -1246,6 +1246,39 @@ def generate_pdf():
     
     return jsonify({'message': 'PDF report generated successfully', 'pdf_filename': pdf_filename}), 200
 
+@app.route('/get_score', methods=['POST'])
+def get_score():
+    #try:
+        data = request.get_json()
+        
+        email1 = data['email']
+        print("email1:---------",email1)
+        try:
+            email = email1["email"]
+        except Exception as e:
+            print("in save_custmr_1:-----",e)
+            email = email1
+        print("email:-----------",email)
+        ### Extracting customer_id from email ###
+        cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
+        custo_id = cursor.fetchone()
+        customer_id = custo_id[0]
+        print("customer_id:-----------",customer_id)
+        
+        insert_query = """SELECT neo_score FROM eligibility_details WHERE customer_id = %s"""
+        values = (customer_id)
+
+        cursor.execute(insert_query, values)
+        conn.commit()
+        neo = cursor.fetchone()
+        neo_scor = neo[0]
+        print("neo_score:----",neo_scor)
+        
+        return neo_scor
+    
+    
+
+
 if __name__ == '__main__':  
     app.run(debug=True) 
 
