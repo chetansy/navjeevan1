@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Customer NEO Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
+        h1 {
+            text-align: center;
+            background-color: #f2f2f2;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        footer {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>NEO Credit Assessment Report</h1>
+    <h2>Personal Details:</h2>
+    {{ data.personal_details_table | safe }}
+    <h2>Other Details:</h2>
+    {{ data.other_details_table | safe }}
+    <footer>
+        Page 1
+    </footer>
+</body>
+</html>
