@@ -25,7 +25,8 @@ import logging
 import datetime
 from datetime import datetime,timedelta
 import json
-
+import pandas as pd
+import sklearn
 app = Flask(__name__)
 mail = Mail(app)
 
