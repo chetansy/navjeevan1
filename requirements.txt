@@ -6,3 +6,4 @@ pandas
 scikit-learn
 numpy
 prettytable
+pdfkit
