@@ -2,3 +2,5 @@ gunicorn
 flask
 flask_mail
 psycopg2
+pandas
+scikit-learn
