@@ -33,6 +33,11 @@ import pickle
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.metrics import mean_squared_error
+
+import pdfkit
+from jinja2 import Environment, FileSystemLoader
+from prettytable import PrettyTable
+from bs4 import BeautifulSoup
 app = Flask(__name__)
 mail = Mail(app)
 
@@ -1122,7 +1127,7 @@ pdfkit_options = {
 
 
 #pdfkit_config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')
-env = Environment(loader=FileSystemLoader('.'))
+#env = Environment(loader=FileSystemLoader('.'))
 neo_report_template = env.get_template('neo_report.html')
 
 @app.route('/generate_pdf', methods=['GET'])
