@@ -860,6 +860,7 @@ def save_customer_details1():
 def save_customer_details2():
     #try:
         data = request.get_json()
+        
         email1 = data['email']
         print("email1:---------",email1)
         try:
@@ -879,7 +880,7 @@ def save_customer_details2():
         industry  = data['industry']
         age_of_business  = data['age_of_business']
         type_of_credit  = data['type_of_credit']
-        required_credit_amount  = int(data['required_credit_amount'])
+        required_credit_amount  = data['required_credit_amount']
         
         print("existing_emi:-----",existing_emi)
         print("emi_amount:-----",emi_amount)
@@ -896,10 +897,13 @@ def save_customer_details2():
 
         cursor.execute(insert_query, values)
         conn.commit()
-	
-        neo_score = randint(45, 65)
-        #eligible_score = get_eligible_amount(email)
-        eligible_score = int(required_credit_amount * (70/100))
+        
+        neo_score = get_neo_score(email)
+        print("neo_score:------------",neo_score)
+        eligible_score = get_eligible_amount(email)
+        print("eligible_score:------------",eligible_score)
+        #neo_score = randint(45, 65)
+        #eligible_score = (required_credit_amount * (70/100))
         
         insert_query = """UPDATE eligibility_details SET neo_score = %s, eligible_amount = %s WHERE customer_id = %s"""
         values = (
