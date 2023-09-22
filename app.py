@@ -661,11 +661,11 @@ def email_otp_verification():
 ############################ API for signup page############################
 
 ############################ API for forget/Reset password ############################
+############################ API for forget/Reset password ############################
 @app.route('/change_forgot_password', methods=['POST'])
 def change_forgot_password():
     try:
-        customer_id = session['customer_id']
-        print("customer_id:-----------",customer_id)
+
         mobile = int(request.json.get("mobile"))
         email = request.json.get("email")
         new_password = request.json.get("new_password")
@@ -674,6 +674,14 @@ def change_forgot_password():
         print("email:------------",email)
         print("new_password:------------",new_password)
         print("confirm_password:------------",confirm_password)
+        
+        cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
+        custo_id = cursor.fetchone()
+        print("custo_id:----", custo_id[0])
+        customer_id = custo_id[0]
+        print("customer_id:-----------",customer_id)
+        
+        
         if new_password != confirm_password:
             raise ValueError("NewPassword and ConfirmPassword does not match")
 
