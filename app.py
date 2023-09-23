@@ -573,8 +573,6 @@ def email_sendotp():
 @app.route('/email_otp_verification', methods=['POST'])
 def email_otp_verification():
     try:
-        
-        
 
         cursor.execute("SELECT customer_id,email  FROM public.login_details ORDER BY customer_id DESC LIMIT 1" )
         cust_id_all = cursor.fetchone()
@@ -618,15 +616,11 @@ def email_otp_verification():
     except Exception as e:
         logging.error(f"Exception: {e}")
         return jsonify({"status": "error", "message": "An unexpected error occurred."}), 500
-        
-############################ API for signup page############################
-
-############################ API for forget/Reset password ############################
+       
 ############################ API for forget/Reset password ############################
 @app.route('/change_forgot_password', methods=['POST'])
 def change_forgot_password():
     try:
-
         mobile = int(request.json.get("mobile"))
         email = request.json.get("email")
         new_password = request.json.get("new_password")
@@ -728,42 +722,6 @@ def otp_change_forgot_password():
        return "Invalid mobile number/emailId"
 
 ########################### API for save customer details ####################################
-
-@app.route('/save_customer_details', methods=['POST'])
-def save_customer_details():
-    try:
-        data = request.get_json()
-        customer_id = data['customer_id']
-        pan = data['pan']
-        designation = data['designation']
-        average_monthly_income  = data['average_monthly_income']
-        average_monthly_expense  = data['average_monthly_expense']
-        existing_emi  = data['existing_emi']
-        emi_amount  = data['emi_amount']
-        industry  = data['industry']
-        age_of_business  = data['age_of_business']
-        type_of_credit  = data['type_of_credit']
-        required_credit_amount  = data['required_credit_amount']
-        
-        insert_query = """
-            INSERT INTO customer_details (customer_id, pan, designation, average_monthly_income, average_monthly_expense, existing_emi, emi_amount, industry, age_of_business, type_of_credit, required_credit_amount)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """
-        values = (
-            customer_id, pan, designation, average_monthly_income, average_monthly_expense, existing_emi, emi_amount, industry, age_of_business, type_of_credit, required_credit_amount
-            )
-
-        cursor.execute(insert_query, values)
-        conn.commit()
-
-        response = {"message": "Data saved successfully"}
-        return jsonify(response), 200
-
-    except Exception as e:
-        error_response = {"error": str(e)}
-        return jsonify(error_response), 500
-
-
 
 @app.route('/save_customer_details1', methods=['POST'])
 def save_customer_details1():
@@ -878,7 +836,6 @@ def save_customer_details2():
         return jsonify(response), 200
 
 
-
 ########################### API for pan verification ####################################
 
 @app.route('/pan_verification', methods=['POST'])
@@ -920,175 +877,7 @@ def pan_verification():
     
     return jsonify(response)
 
-
-if __name__ == '__main__':  
-    app.run() 
-########################### API for save cibil score ####################################
- 
-@app.route('/generate_and_save_cibil_score', methods=['POST'])
-def generate_and_save_cibil_score():
-    try:
-        customer_id = request.json.get('customer_id')
-        cibil_score = request.json.get('cibil_score')
-        neo_score = request.json.get('neo_score')
-        eligible_amount = request.json.get('eligible_amount')
-        
-        cibil_score = random.randint(300, 900)
-        cursor.execute("SELECT * FROM eligibility_details WHERE customer_id = %s", (customer_id,))
-        existing_data = cursor.fetchone()
-    
-        if existing_data:
-            cursor.execute("UPDATE eligibility_details SET cibil_score = %s WHERE customer_id = %s AND neo_score = %s AND eligible_amount = %s", (customer_id, cibil_score, neo_score, eligible_amount))
-            conn.commit()        
-            response = {
-                'message': 'CIBIL score updated successfully.',
-                'status': 'success'
-            }
-        else:
-            cursor.execute("INSERT INTO eligibility_details (customer_id, cibil_score, neo_score, eligible_amount) VALUES (%s, %s, %s, %s)", (customer_id, cibil_score, neo_score, eligible_amount))
-            conn.commit()    
-            response = {
-                'message': 'CIBIL score saved successfully.',
-                'status': 'success'
-            }     
-    except Exception as e:
-            response = {
-                'message': 'An error occurred: ' + str(e),
-                'status': 'error'
-            }
-    
-    return jsonify(response)
-
-########################### API for NEO SCORE ####################################
- 
-
-
-
-########################### API for ELIGIBLE AMOUNT ####################################
-################################ Verify OTP to Email API #################################
-
-
-@app.route('/all_otp_verification', methods=['POST'])
-def all_otp_verification1():
-    try:
-        data = request.json
-        mobile = data.get('mobile')
-        email = data.get('email')
-        provided_otp = data.get('otp')
-        provided_email_otp = data.get('provided_otp')
-
-        if mobile:
-            return verify_mobile_otp(mobile, provided_otp)
-        elif email:
-            return verify_email_otp(email, provided_email_otp)
-        else:
-            raise ValueError("Neither mobile nor email provided in the request.")
-
-    except ValueError as ve:
-        logging.error(f"ValueError: {ve}")
-        return jsonify({"status": "error", "message": str(ve)}), 400
-
-    except Exception as e:
-        logging.error(f"Exception: {e}")
-        return jsonify({"status": "error", "message": "An unexpected error occurred."}), 500
-
-def verify_mobile_otp(mobile, provided_otp1):
-    try:
-        #mobile = request.json.get('mobile')
-        provided_otp1 = request.json.get('otp')
-
-        if not mobile or len(str(mobile)) != 10:
-            raise ValueError("Invalid mobile number provided.")
-        if not provided_otp1 or len(str(provided_otp1)) != 6:
-            raise ValueError("Invalid OTP provided.")
-
-        cursor.execute(
-            "SELECT otp, otp_status, otp_generated_date_time FROM public.login_details WHERE mobile = %s",
-            (mobile,)
-        )
-        record = cursor.fetchone()
-        if not record:
-            raise ValueError("Mobile number not found in the database.")
-
-        db_otp, otp_status, otp_generated_date_time = record
-        if otp_status == "SENT":
-            current_time = datetime.now()
-            difference_in_minutes = (current_time - otp_generated_date_time).total_seconds() / 60
-            print(difference_in_minutes)
-            if difference_in_minutes > 10:
-                cursor.execute(
-                    "UPDATE public.login_details SET otp_status = 'EXPIRED' WHERE mobile = %s",
-                    (mobile,)
-                )
-                conn.commit()
-                return jsonify({"status": "error", "message": "OTP is Expired please re-generate otp again"}), 400
-            else:
-                if provided_otp1 == db_otp:
-                    cursor.execute(
-                        "UPDATE public.login_details SET otp_status = 'SUCCESS' WHERE mobile = %s",
-                        (mobile,)
-                    )
-                    conn.commit()
-                    return jsonify({"status": "success", "message": "OTP verification SUCCESS"}), 200
-                else:
-                    cursor.execute(
-                        "UPDATE public.login_details SET otp_status = 'FAILED' WHERE mobile = %s",
-                        (mobile,)
-                    )
-                    conn.commit()
-                    return jsonify({"status": "error", "message": "Invalid OTP provided."}), 400
-        else:
-            return jsonify({"status": "error", "message": "OTP is Expired please re-generate otp again"}), 400
-
-    except ValueError as ve:
-        logging.error(f"ValueError: {ve}")
-        return jsonify({"status": "error", "message": str(ve)}), 400
-
-    except Exception as e:
-        logging.error(f"Exception: {e}")
-        return jsonify({"status": "error", "message": "An unexpected error occurred."}), 500
-        
-    return jsonify({"status": "success", "message": "Mobile OTP verification SUCCESS"}), 200
-
-def verify_email_otp(email, provided_email_otp):
-    try:
-        #email = request.json.get('email')
-        #provided_otp = request.json.get('provided_otp')
-        cursor.execute("SELECT email_otp, email_otp_status, email_otp_generated_date_time FROM public.login_details WHERE email = %s", (email,))
-        record = cursor.fetchone()
-        if not record:
-            raise ValueError("Email not registered.")
-        
-        db_otp, otp_status, otp_generated_date_time = record
-        
-        if otp_status == "SENT":
-            current_time = datetime.now()
-            difference_in_minutes = (current_time - otp_generated_date_time).total_seconds() / 60
-
-            if difference_in_minutes > 10:
-                cursor.execute("UPDATE public.login_details SET email_otp_status = 'EXPIRED' WHERE email = %s", (email,))
-                conn.commit()
-                return jsonify({"status": "error", "message": "OTP is expired. Please re-generate OTP again."}), 400
-            else:
-                if provided_email_otp == db_otp:
-                    cursor.execute("UPDATE public.login_details SET email_otp_status = 'SUCCESS' WHERE email = %s", (email,))
-                    conn.commit()
-                    return jsonify({"status": "success", "message": "OTP verification successful."}), 200
-                else:
-                    cursor.execute("UPDATE public.login_details SET email_otp_status = 'FAILED' WHERE email = %s", (email,))
-                    conn.commit()
-                    return jsonify({"status": "error", "message": "Invalid OTP provided."}), 400
-        else:
-            return jsonify({"status": "error", "message": "Please re-generate OTP again."}), 400
-
-    except ValueError as ve:
-        logging.error(f"ValueError: {ve}")
-        return jsonify({"status": "error", "message": str(ve)}), 400
-    except Exception as e:
-        logging.error(f"Exception: {e}")
-        return jsonify({"status": "error", "message": "An unexpected error occurred."}), 500
-        
-    return jsonify({"status": "success", "message": "Email OTP verification successful."}), 200
+########################### API for Generate PDF From HTML ####################################
 
 pdfkit_options = {
     'page-size': 'A4',
@@ -1249,6 +1038,6 @@ def get_score():
     return {"neo_scor": neo_scor, "eligibl_scor":eligibl_scor}
 
 if __name__ == '__main__':  
-    app.run(debug=True) 
+    app.run() 
 
 
