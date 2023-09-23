@@ -2,7 +2,6 @@
 """
 Created on Fri Jul  7 12:19:26 2023
 
-@author: Payal
 """
 import random
 import psycopg2
@@ -275,7 +274,7 @@ def get_eligible_amount(email):
     #return jsonify({'eligible_amount': eligible_amount[0]})
     return eligible_amount[0]
 ##########################################################################
-@app.route('/', methods=['POST'])
+@app.route('/', methods=['GET'])
 def index():
 	return 'Hello World'
 
