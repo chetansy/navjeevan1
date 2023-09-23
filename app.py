@@ -40,12 +40,6 @@ from bs4 import BeautifulSoup
 app = Flask(__name__)
 mail = Mail(app)
 
-
-#app.config["MAIL_SERVER"]='smtpout.secureserver.net'
-#app.config["MAIL_PORT"] = 587      
-#app.config["MAIL_USERNAME"] = 'pallavi.uike@creditsiddhi.com'  
-#app.config['MAIL_PASSWORD'] = 'psmsuuved06#'  
-
 app.config["SECRET_KEY"] = 'root'
 app.config["MAIL_SERVER"]='smtp.googlemail.com'
 app.config["MAIL_USE_TLS"] = True      
@@ -98,32 +92,6 @@ def get_customer_id_for_user(email):
         print(f"Error in get_customer_id_for_user: {e}")
         return None
 
-# Function to register a new user and return customer_id
-def register_new_user(name, email, password):
-    try:
-        cursor = conn.cursor()
-        cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
-        existing_user = cursor.fetchone()
-
-        if existing_user:
-            return None
-
-        # Insert the new user into the database
-        cursor.execute("INSERT INTO customer_details (name, email, password) VALUES (%s, %s, %s)", (name, email, password))
-        conn.commit()
-
-        # Fetch the customer_id of the newly registered user
-        cursor.execute("SELECT customer_id FROM customer_details WHERE email = %s", (email,))
-        new_user = cursor.fetchone()
-
-        if new_user:
-            return new_user[0]
-        else:
-            return None
-
-    except Exception as e:
-        print(f"Error in register_new_user: {e}")
-        return None
 
 
 ############################################################################################################
@@ -434,11 +402,6 @@ def signup_with_credentials(data):
         mobile = data.get('mobile')
         password = data.get('password')
         #customer_id = session.get('customer_id',None)
-        #customer_id = register_new_user(name, email, password)
-        #if customer_id:
-            # Set customer_id in the session
-         #   session['customer_id'] = customer_id
-        
         
         if not is_valid_password(password):
             response_data = {"status": "error", "message": "Invalid password"}
