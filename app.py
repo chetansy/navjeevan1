@@ -943,7 +943,7 @@ pdfkit_options = {
     'margin-left': '0mm',
 }
 
-pdfkit_config = pdfkit.configuration(wkhtmltopdf="C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe")
+#pdfkit_config = pdfkit.configuration(wkhtmltopdf="C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe")
 env = Environment(loader=FileSystemLoader('.'))
 neo_report_template = env.get_template('neo_report.html')
 from html2image import Html2Image
