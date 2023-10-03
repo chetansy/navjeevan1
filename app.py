@@ -1,8 +1,3 @@
-# -- coding: utf-8 --
-"""
-Created on Fri Jul  7 12:19:26 2023
-
-"""
 import random
 import psycopg2
 import psycopg2.extras
@@ -11,12 +6,12 @@ import cgi
 form = cgi.FieldStorage()
 import urllib.request
 import urllib.parse
-from flask import Flask, request, session, redirect, url_for, render_template, flash, jsonify
+from flask import Flask, request, session, redirect, url_for, render_template, flash, jsonify,send_file
 import psycopg2 
 import psycopg2.extras
 import re 
 from werkzeug.security import generate_password_hash, check_password_hash
-
+import os
 from flask_mail import *  
 import smtplib
 from random import *
@@ -25,7 +20,7 @@ import datetime
 from datetime import datetime,timedelta
 import json
 import pandas as pd
-import sklearn
+import pickle
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 import pickle
 
@@ -37,6 +32,7 @@ import pdfkit
 from jinja2 import Environment, FileSystemLoader
 from prettytable import PrettyTable
 from bs4 import BeautifulSoup
+
 app = Flask(__name__)
 mail = Mail(app)
 
@@ -47,8 +43,6 @@ app.config["MAIL_PORT"] = 587
 app.config["MAIL_USERNAME"] = 'navjeevan.creditsiddhi@gmail.com'  
 app.config['MAIL_PASSWORD'] = 'endf ghdw unlj ajtc'  
 
-
-mail = Mail(app)
 #app.secret_key = 'root'
 logging.basicConfig(level=logging.INFO)
 
@@ -93,8 +87,21 @@ def get_customer_id_for_user(email):
         return None
 
 
+import urllib.request
+import urllib.parse
 
-############################################################################################################
+smsApiKey = "MmZhOTNmMWQ2MzNmMzI5MDEwNWQ1YjZjMjNmZjgwMDM="
+smsSenderId = "CRDSID"
+smsApiUrl = "https://api.textlocal.in/send/?"
+
+def sendSMS(apikey, numbers, sender, message):
+    data =  urllib.parse.urlencode({'apikey': apikey, 'numbers': numbers,
+        'message' : message, 'sender': sender})
+    data = data.encode('utf-8')
+    request = urllib.request.Request("https://api.textlocal.in/send/?")
+    f = urllib.request.urlopen(request, data)
+    fr = f.read()
+    return(fr)
 
 
 def get_neo_score(email):
@@ -241,87 +248,111 @@ def get_eligible_amount(email):
 
     #return jsonify({'eligible_amount': eligible_amount[0]})
     return eligible_amount[0]
-##########################################################################
-@app.route('/', methods=['GET'])
-def index():
-	return 'Hello World'
 
 ############################ API for login page############################
 @app.route('/login', methods=['POST'])
 def login():
-    email = request.json['email']
-    password = request.json['password']
-    print("email:----",email)
-    print("password:----------",password)
     
-    customer_id = get_customer_id_for_user(email) 
-    # Set the customer_id in the session
-    session['customer_id'] = customer_id
-    
-    
-    cursor.execute("SELECT password, last_password_change FROM login_details WHERE email = %s", (email,))
-    user_data = cursor.fetchone()
+    data = request.get_json()
 
-    if user_data:
-        _hashed_password, last_password_change = user_data
-
-        current_date = datetime.now()
-        if last_password_change is None:
-            return jsonify({'message': 'Last Password change date not found'}), 500
-
-        expiration_date = last_password_change + timedelta(days=PASSWORD_EXPIRY_DAYS)
-        if current_date > expiration_date:
-            return jsonify({'message': 'Your password has expired. Please change your password.'}), 401
-
-        if check_password_hash(_hashed_password, password):
-            # Reset login attempts on successful login
-            session['login_attempts'] = 0
-            return jsonify({'message': 'Login successful'}), 200
-        else:
-            # Increment login attempts
-            session['login_attempts'] = session.get('login_attempts', 0) + 1
-            # Check if maximum login attempts reached
-            if session['login_attempts'] >= MAX_LOGIN_ATTEMPTS:
-                return jsonify({'message': 'Maximum login attempts exceeded. Please try again later.'}), 401        
-            else:
-                return jsonify({'message': 'Invalid password'}), 401
+    if data.get('email') is None or data.get('password') is None:
+        print({"message": "Email and password cannot be None"})
+        return jsonify({"message": "Email and password cannot be None"}), 400
     else:
-        return jsonify({'message':'User not found'}), 404
+        email = request.json['email']
+        password = request.json['password']
+        print("email:----",email)
+        print("password:----------",password)
+        
+        customer_id = get_customer_id_for_user(email) 
+        # Set the customer_id in the session
+        session['customer_id'] = customer_id
+        
+        
+        cursor.execute("SELECT password, last_password_change,email_otp_status FROM login_details WHERE email = %s", (email,))
+        user_data = cursor.fetchone()
+    
+        if user_data:
+            _hashed_password, last_password_change,email_otp_status = user_data
+            print("email_otp_status:------",email_otp_status)
+            if email_otp_status != "SUCCESS":
+                return jsonify({'message': 'Kindly Verify account before login'}), 500
+            
+            current_date = datetime.now()
+            if last_password_change is None:
+                return jsonify({'message': 'Last Password change date not found'}), 500
+    
+            expiration_date = last_password_change + timedelta(days=PASSWORD_EXPIRY_DAYS)
+            if current_date > expiration_date:
+                return jsonify({'message': 'Your password has expired. Please change your password.'}), 401
+    
+            if check_password_hash(_hashed_password, password):
+                # Reset login attempts on successful login
+                session['login_attempts'] = 0
+                return jsonify({'message': 'Login successful'}), 200
+            else:
+                # Increment login attempts
+                session['login_attempts'] = session.get('login_attempts', 0) + 1
+                # Check if maximum login attempts reached
+                if session['login_attempts'] >= MAX_LOGIN_ATTEMPTS:
+                    return jsonify({'message': 'Maximum login attempts exceeded. Please try again later.'}), 401        
+                else:
+                    return jsonify({'message': 'Invalid password'}), 401
+        else:
+            return jsonify({'message':'User not found'}), 404
+
+
 
 ############################ API for signup page############################
 @app.route('/signup', methods=['POST'])
+
 def signup():
     request_data = request.json
-    try:
-        regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')  
-      
-        email = request_data.get('email')
-        mobile = request_data.get('mobile')
-    
-        if re.fullmatch(regex, email):  
-            print("The given mail is valid")  
-            if mobile and len(str(mobile)) == 10:
-                print("The mobile is valid")  
-                signup_result = signup_with_credentials(request_data)
-                print("signup_result:------------",signup_result['message'])
-                if signup_result['message'] == "User signup successfully" :
-                    print("Yes:---------")
-                    if request_data['mobile'] and request_data['email']:
-                        print("getting mobile:----",request_data['email'])
-                        mobile_sendotp(request_data)
-            
-                        print("getting email:----")
-                        email_sendotp1(request_data)
-            
-                return jsonify(signup_result)
-            else:
-                return jsonify({"status": "error", "message": "Invalid mobile number provided."})
-        else:  
-            print("The given mail is invalid")  
-            return jsonify({"status": "error", "message": "The given mail is invalid."})
-    except Exception as e:
-        print("ERROR_Ssingup:----",e)
-        return jsonify({"status": "error", "message": e})
+    data = request.get_json()
+    required_fields = ['name', 'email', 'mobile', 'password']
+     
+    for field in required_fields:
+        if data[field] is None:
+            print({"message": f"Kindly fill all the Details"})
+            return jsonify({"message": "Kindly fill all the Details"}), 400
+        else:
+            try:
+                regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')  
+                
+                email = request_data.get('email')
+                mobile = request_data.get('mobile')
+                
+                if re.fullmatch(regex, email):  
+                    print("The given mail is valid")  
+                    if mobile and len(str(mobile)) == 10:
+                        print("The mobile is valid")
+                        # Check if email or mobile already exists in the database
+                        if email_exists(email):
+                            return jsonify({"message": "Email already exists"}), 400
+        
+                        if mobile_exists(mobile):
+                            return jsonify({"message": "Mobile number already exists"}), 400
+                        
+                        signup_result = signup_with_credentials(request_data)
+                        print("signup_result:------------",signup_result['message'])
+                        if signup_result['message'] == "User signup successfully" :
+                            print("Yes:---------")
+                            if request_data['mobile'] and request_data['email']:
+                                print("getting mobile:----",request_data['email'])
+                                mobile_sendotp(request_data)
+                    
+                                print("getting email:----")
+                                email_sendotp1(request_data)
+                        
+                            return jsonify(signup_result)
+                    else:
+                        return jsonify({"status": "error", "message": "Invalid mobile number provided."})
+                else:  
+                    print("The given mail is invalid")  
+                    return jsonify({"status": "error", "message": "The given mail is invalid."})
+            except Exception as e:
+                print("ERROR_Ssingup:----",e)
+                return jsonify({"status": "error", "message": e})
 
 def mobile_sendotp(data):
     print("mobile:----",data.get('mobile'))
@@ -338,6 +369,11 @@ def mobile_sendotp(data):
             (otp, datetime.now(), mobile)
         )
         conn.commit()
+        #msg = "Your one-time password (OTP) is " + " " + str(otp)
+        msg = f"""Welcome to CreditSiddhi\nUse OTP {str(otp)} to login to your CreditSiddhi account.\nThis is valid for 10 minutes.\nCreditSiddhi personnel do not ask for OTP."""
+                
+        resp =  sendSMS(smsApiKey, mobile,smsSenderId, msg)
+        print("msg from 3rd party apis:-----------",resp)
         logging.info(f"OTP sent to mobile number: {mobile}")
         response_data = {"status": "success", "message": "OTP sent successfully."}
         return response_data
@@ -397,11 +433,12 @@ def email_sendotp1(data):
 
 def signup_with_credentials(data):
     try:
+	    # Check if required fields are missing
+
         name = data.get('name')
         email = data.get('email')
         mobile = data.get('mobile')
         password = data.get('password')
-        #customer_id = session.get('customer_id',None)
         
         if not is_valid_password(password):
             response_data = {"status": "error", "message": "Invalid password"}
@@ -409,7 +446,7 @@ def signup_with_credentials(data):
 
 
         _hashed_password = generate_password_hash(password)
-
+        
         try:
             current_date = datetime.now()
             cursor.execute("INSERT INTO login_details (name, email, mobile, password, last_password_change) VALUES (%s, %s, %s, %s, %s)", (name, email, mobile, _hashed_password, current_date))
@@ -430,6 +467,16 @@ def signup_with_credentials(data):
         response_data = {"status": "error", "message": "An unexpected error occurred."}
         return response_data
 
+def email_exists(email):
+    # Check if email already exists in the database
+    cursor.execute("SELECT 1 FROM login_details WHERE email = %s", (email,))
+    return cursor.fetchone() is not None
+
+def mobile_exists(mobile):
+    # Check if mobile number already exists in the database
+    cursor.execute("SELECT 1 FROM login_details WHERE mobile = %s", (mobile,))
+    return cursor.fetchone() is not None
+
 def is_valid_password(password):
     if (
         len(password) < PASSWORD_MIN_LENGTH
@@ -441,8 +488,6 @@ def is_valid_password(password):
     return True
 	
 
-
-
 ########################### API for LOGOUT PAGE ####################################
 @app.route('/logout/')
 def logout():
@@ -450,35 +495,6 @@ def logout():
     print("Logged out successfully!")
     return redirect(url_for('login'))
 
-########################### API for sendOTP to Mobile ####################################
-@app.route('/sendotp', methods=['POST'])
-def send_otp():
-    try:
-        mobile = request.json.get('mobile')
-        if not mobile or len(str(mobile)) != 10:
-            raise ValueError("Invalid mobile number provided.")
-       
-        otp = random.randint(100000, 999999)
-        cursor = conn.cursor()
-        cursor.execute(
-            "UPDATE public.login_details "
-            "SET otp = %s, otp_status = 'SENT', otp_generated_date_time = %s "
-            "WHERE mobile = %s", 
-            (otp, datetime.now(), mobile)
-        )
-        if cursor.rowcount == 0:
-            raise ValueError("Mobile number not found in the database.")
-        conn.commit()
-        logging.info(f"OTP sent to mobile number: {mobile}")
-        return jsonify({"status": "success", "message": "OTP sent successfully."}), 200
-
-    except ValueError as ve:
-        logging.error(f"ValueError: {ve}")
-        return jsonify({"status": "error", "message": str(ve)}), 400
-
-    except Exception as e:
-        logging.error(f"Exception: {e}")
-        return jsonify({"status": "error", "message": "An unexpected error occurred."}), 500
      
 ########################### API for Mobile OTP verification ####################################
 @app.route('/otp-verification', methods=['POST'])
@@ -546,34 +562,13 @@ def otp_verification():
         logging.error(f"Exception: {e}")
         return jsonify({"status": "error", "message": "An unexpected error occurred."}), 500
         
-################################ Sent OPT to Email API ###################################
-@app.route('/email_sendotp',methods = ["GET","POST"])  
-def email_sendotp():  
-    email = request.json["email"]  
-    print(email)
-    email_otp = randint(100000,999999) 
-    
-    cursor = conn.cursor()
-    cursor.execute(
-          "UPDATE public.login_details "
-          "SET email_otp = %s, email_otp_status = 'SENT', email_otp_generated_date_time = %s "
-          "WHERE email = %s", (email_otp, datetime.now(), email)
-      )
-    if cursor.rowcount == 0:
-        raise ValueError("Please enter registerd email.")
-    conn.commit() 
-    msg = Message('OTP',sender = 'pallavi.uike@creditsiddhi.com', recipients = [email])  
-    msg.body = "Your one time password(OTP) is " + " " + str(email_otp)
-    mail.send(msg)  
-    
-    logging.info(f"OTP sent to registerd email: {email}")
-    return jsonify({"status": "success", "message": "OTP sent successfully."}), 200
+
 
 ################################ Verify OTP to Email API #################################
 @app.route('/email_otp_verification', methods=['POST'])
 def email_otp_verification():
     try:
-
+        
         cursor.execute("SELECT customer_id,email  FROM public.login_details ORDER BY customer_id DESC LIMIT 1" )
         cust_id_all = cursor.fetchone()
         print("EMail:--------",cust_id_all[1])
@@ -616,63 +611,74 @@ def email_otp_verification():
     except Exception as e:
         logging.error(f"Exception: {e}")
         return jsonify({"status": "error", "message": "An unexpected error occurred."}), 500
-       
+        
+
 ############################ API for forget/Reset password ############################
 @app.route('/change_forgot_password', methods=['POST'])
 def change_forgot_password():
     try:
-        mobile = int(request.json.get("mobile"))
-        email = request.json.get("email")
-        new_password = request.json.get("new_password")
-        confirm_password = request.json.get("confirm_pass")
-        print("mobile:------------",type(mobile),mobile)
-        print("email:------------",email)
-        print("new_password:------------",new_password)
-        print("confirm_password:------------",confirm_password)
-        
-        cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
-        custo_id = cursor.fetchone()
-        print("custo_id:----", custo_id[0])
-        customer_id = custo_id[0]
-        print("customer_id:-----------",customer_id)
-        
-        
-        if new_password != confirm_password:
-            raise ValueError("NewPassword and ConfirmPassword does not match")
-
-        cursor.execute('SELECT email FROM public.login_details WHERE email = %s', (email,))
-        account = cursor.fetchone()
-        if not account:
-            raise ValueError("Invalid mobile number")
-        print("account:------------",type(account[0]),account[0])
-        db_email = account[0]
-        
-        cursor.execute('SELECT mobile FROM public.login_details WHERE mobile = %s', (mobile,))
-        account1 = cursor.fetchone()
-        if not account:
-            raise ValueError("Invalid mobile number")
-        print("account1:------------",type(account1[0]),account1[0])
-        db_mobile = int(account1[0])
-        
-        if email == db_email:
-            if mobile == db_mobile:
-                if not new_password:
-                    raise ValueError("NewPassword is missing or None.")
-                    
-                if not is_valid_password(new_password):
-                    raise ValueError("Invalid password. Password does not meet policy requirements.")
-    
-                _hashed_password = generate_password_hash(new_password)
-                cursor.execute(
-                    "UPDATE public.login_details SET password = %s,encrypted_password = %s WHERE mobile = %s",
-                    (_hashed_password,_hashed_password, mobile)
-                )
-                conn.commit()
-                return jsonify({"status": "success", "message": "Password updated successfully!"})
+        request_data = request.get_json()
+        data = request.get_json()
+        required_fields = ['new_password', 'email', 'mobile', 'confirm_pass']
+         
+        for field in required_fields:
+            if data[field] is None:
+                print({"message": "Kindly fill all the Details"})
+                return jsonify({"message": "Kindly fill all the Details"}), 400
             else:
-                raise ValueError("Invalid Mobile")
-        else:
-            raise ValueError("Invalid Email")
+        
+                mobile = int(request.json.get("mobile"))
+                email = request.json.get("email")
+                new_password = request.json.get("new_password")
+                confirm_password = request.json.get("confirm_pass")
+                print("mobile:------------",type(mobile),mobile)
+                print("email:------------",email)
+                print("new_password:------------",new_password)
+                print("confirm_password:------------",confirm_password)
+                
+                cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
+                custo_id = cursor.fetchone()
+                print("custo_id:----", custo_id[0])
+                customer_id = custo_id[0]
+                print("customer_id:-----------",customer_id)
+                
+                
+                if new_password != confirm_password:
+                    raise ValueError("NewPassword and ConfirmPassword does not match")
+        
+                cursor.execute('SELECT email FROM public.login_details WHERE email = %s', (email,))
+                account = cursor.fetchone()
+                if not account:
+                    raise ValueError("Invalid mobile number")
+                print("account:------------",type(account[0]),account[0])
+                db_email = account[0]
+                
+                cursor.execute('SELECT mobile FROM public.login_details WHERE mobile = %s', (mobile,))
+                account1 = cursor.fetchone()
+                if not account:
+                    raise ValueError("Invalid mobile number")
+                print("account1:------------",type(account1[0]),account1[0])
+                db_mobile = int(account1[0])
+                
+                if email == db_email:
+                    if mobile == db_mobile:
+                        if not new_password:
+                            raise ValueError("NewPassword is missing or None.")
+                            
+                        if not is_valid_password(new_password):
+                            raise ValueError("Invalid password. Password does not meet policy requirements.")
+            
+                        _hashed_password = generate_password_hash(new_password)
+                        cursor.execute(
+                            "UPDATE public.login_details SET password = %s,encrypted_password = %s WHERE mobile = %s",
+                            (_hashed_password,_hashed_password, mobile)
+                        )
+                        conn.commit()
+                        return jsonify({"status": "success", "message": "Password updated successfully!"})
+                    else:
+                        raise ValueError("Invalid Mobile")
+                else:
+                    raise ValueError("Invalid Email")
 
     except ValueError as ve:
         logging.error(f"ValueError: {ve}")
@@ -696,30 +702,58 @@ def is_valid_password(password):
 ############################ API for new OTP ############################
 @app.route('/otp_change_forgot_password', methods=['POST'])
 def otp_change_forgot_password():
-   email = request.json.get("email")  
-   print(email)
-   mobile = request.json.get("mobile") 
-   print(mobile)
-   
-   cursor = conn.cursor()
-   cursor.execute('SELECT * FROM login_details WHERE mobile = %s', (mobile,))
-   print("mobile details")
-   account = cursor.fetchone()
-   if account:
-           otp = randint(100000, 999999)
-           cursor = conn.cursor()
-           cursor.execute(
-               "UPDATE public.login_details "
-               "SET new_otp = %s "
-               "WHERE mobile = %s and email = %s", 
-               (otp, mobile, email)
-           )
-           conn.commit()        
     
-           logging.info(f"OTP sent to mobile number: {mobile}")
-           return jsonify({"status": "success", "message": "OTP sent successfully."}), 200
-   else:
-       return "Invalid mobile number/emailId"
+    request_data = request.get_json()
+    # Check if required fields are missing
+    required_fields = ['email', 'mobile']
+    missing_fields = [field for field in required_fields if field not in request_data]
+   
+    if missing_fields:
+ 	   return jsonify({"error": f"The following fields are missing: {', '.join(missing_fields)}"}), 400
+   
+    email = request.json.get("email")  
+    print(email)
+    mobile = request.json.get("mobile") 
+    print(mobile)
+    
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM login_details WHERE mobile = %s', (mobile,))
+    print("mobile details")
+    account = cursor.fetchone()
+    if account:
+            otp = randint(100000, 999999)
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE public.login_details "
+                "SET new_otp = %s "
+                "WHERE mobile = %s and email = %s", 
+                (otp, mobile, email)
+            )
+            conn.commit()        
+     
+            logging.info(f"OTP sent to mobile number: {mobile}")
+            return jsonify({"status": "success", "message": "OTP sent successfully."}), 200
+    else:
+        return "Invalid mobile number/emailId"
+
+###======================= API Retrieval ===============================##
+@app.route('/retrieval', methods=['GET'])
+def retrieve():
+        email = request.args['email']
+        cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
+        custo_id = cursor.fetchone()
+        print("custo_id:----", custo_id[0])
+        customer_id = custo_id[0]
+        try:
+            cursor.execute("SELECT pan,designation,average_monthly_income, average_monthly_expense FROM customer_details WHERE customer_id = %s", (customer_id,))
+            already_details = cursor.fetchone()
+            data1 = {"pan" : already_details[0] , "designation":already_details[1], "average_monthly_income":already_details[2], "average_monthly_expense":already_details[3] }
+            print("PAN:---------",data1)
+            return jsonify({"data" : data1})
+        except Exception as e:
+            print("not stored any data:---",e)
+            data1 = {}
+            return jsonify({"data" : data1})
 
 ########################### API for save customer details ####################################
 
@@ -728,157 +762,179 @@ def save_customer_details1():
 
     try:
         data = request.get_json()
-        #customer_id = session.get('customer_id')
-        #print("customer_id:-----------",customer_id)
-        print("EMAIL_FROM_LOGIN:-----------",data['email'])
+        required_fields = ['occupation', 'email', 'pan', 'monthly_income','monthly_expenses']
+         
+        for field in required_fields:
+            if data[field] is None:
+                print({"message": "Kindly fill all the Details"})
+                return jsonify({"status": "error","message": "Kindly fill all the Details"}), 400
+            else:
+                print("EMAIL_FROM_LOGIN:-----------",data['email'])
+                
+                email = data['email']
+                ### Extracting customer_id from email ###
+                cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
+                custo_id = cursor.fetchone()
+                print("custo_id:----", custo_id[0])
+                customer_id = custo_id[0]
+                
+                if customer_id is None:
+                    return jsonify({"status": "error","message": "Customer ID not found in session"}), 400
+                
+                app.logger.debug(f"customer_id: {customer_id}")
+                pan = data['pan']
+                occupation = data['occupation']
+                monthly_income  = data['monthly_income']
+                monthly_expenses  = data['monthly_expenses']
+                
+                print("customer_id:----" ,customer_id)
+                print("pan:----" ,pan)
+                print("occupation:----" ,occupation)
+                print("monthly_income:----" ,monthly_income)
+                print("monthly_expenses:----" ,monthly_expenses)
+                
+                insert_query = """UPDATE public.customer_details SET pan = %s, designation = %s,average_monthly_income = %s,average_monthly_expense = %s WHERE customer_id = %s"""
+                values = (
+                     pan, occupation ,monthly_income, monthly_expenses,customer_id
+                    )
         
-        email = data['email']
-        ### Extracting customer_id from email ###
-        cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
-        custo_id = cursor.fetchone()
-        print("custo_id:----", custo_id[0])
-        customer_id = custo_id[0]
+                cursor.execute(insert_query, values)
+                conn.commit()
         
-        if customer_id is None:
-            return jsonify({"error": "Customer ID not found in session"}), 400
-        
-        app.logger.debug(f"customer_id: {customer_id}")
-       # customer_id = data['customer_id']
-        pan = data['pan']
-        occupation = data['occupation']
-        monthly_income  = data['monthly_income']
-        print("customer_id:----" ,customer_id)
-        print("pan:----" ,pan)
-        print("occupation:----" ,occupation)
-        print("monthly_income:----" ,monthly_income)
-        monthly_expenses  = data['monthly_expenses']
-        print("monthly_expenses:----" ,monthly_expenses)
-        
-      
-        insert_query = """
-            INSERT INTO public.customer_details(customer_id, pan, designation, average_monthly_income, average_monthly_expense)
-            VALUES (%s, %s, %s, %s, %s)
-        """
-        values = (customer_id, pan, occupation, monthly_income,123)
-
-        cursor.execute(insert_query, values)
-        conn.commit()
-
-        response = {"message": "Data saved successfully"}
-        
-        return jsonify(response), 200
+                response = {"status": "success","message": "Data saved successfully"}
+                
+                return jsonify(response), 200
 
     except Exception as e:
         logging.error(f"Exception: {e}")
         conn.rollback()  # Rollback changes to the database
         error_response = {"error": str(e)}
         return jsonify(error_response), 500
+    
 
+        
+        
 #**********************************************************
 @app.route('/save_customer_details22', methods=['POST'])
 def save_customer_details2():
     #try:
         data = request.get_json()
         
-        email1 = data['email']
-        print("email1:---------",email1)
-        try:
-            email = email1["email"]
-        except Exception as e:
-            print("in save_custmr_1:-----",e)
-            email = email1
-        print("email:-----------",email)
-        ### Extracting customer_id from email ###
-        cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
-        custo_id = cursor.fetchone()
-        customer_id = custo_id[0]
-        print("customer_id:-----------",customer_id)
+        # Check if other required fields are missing
+        required_fields = ['existing_emi', 'emi_amount', 'industry', 'age_of_business', 'type_of_credit', 'required_credit_amount']
+        for field in required_fields:
+            if data[field] is None:
+                print({"message": "Kindly fill all the Details"})
+                return jsonify({"status": "error","message": "Kindly fill all the Details"}), 400
+            else:
+                email1 = data['email']
+                print("email1:---------",email1)
+                try:
+                    email = email1["email"]
+                except Exception as e:
+                    print("in save_custmr_1:-----",e)
+                    email = email1
+                print("email:-----------",email)
+                ### Extracting customer_id from email ###
+                cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
+                custo_id = cursor.fetchone()
+                customer_id = custo_id[0]
+                print("customer_id:-----------",customer_id)
+                
+                existing_emi  = data['existing_emi']
+                emi_amount  = data['emi_amount']
+                industry  = data['industry']
+                age_of_business  = data['age_of_business']
+                type_of_credit  = data['type_of_credit']
+                required_credit_amount  = data['required_credit_amount']
+                
+                print("existing_emi:-----",existing_emi)
+                print("emi_amount:-----",emi_amount)
+                print("industry:-----",industry)
+                print("age_of_business:-----",age_of_business)
+                print("type_of_credit:-----",type_of_credit)
+                print("required_credit_amount:-----",required_credit_amount)
+                
         
-        existing_emi  = data['existing_emi']
-        emi_amount  = data['emi_amount']
-        industry  = data['industry']
-        age_of_business  = data['age_of_business']
-        type_of_credit  = data['type_of_credit']
-        required_credit_amount  = data['required_credit_amount']
+                insert_query = """UPDATE customer_details SET existing_emi = %s, emi_amount = %s, industry = %s, age_of_business = %s, type_of_credit = %s, required_credit_amount = %s WHERE customer_id = %s"""
+                values = (
+                     existing_emi, emi_amount, industry, age_of_business, type_of_credit, required_credit_amount,customer_id
+                    )
         
-        print("existing_emi:-----",existing_emi)
-        print("emi_amount:-----",emi_amount)
-        print("industry:-----",industry)
-        print("age_of_business:-----",age_of_business)
-        print("type_of_credit:-----",type_of_credit)
-        print("required_credit_amount:-----",required_credit_amount)
+                cursor.execute(insert_query, values)
+                conn.commit()
+                
+                neo_score = get_neo_score(email)
+                print("neo_score:------------",neo_score)
+                eligible_score = get_eligible_amount(email)
+                print("eligible_score:------------",eligible_score)
+                #neo_score = randint(45, 65)
+                #eligible_score = (required_credit_amount * (70/100))
+                
+                insert_query = """UPDATE eligibility_details SET neo_score = %s, eligible_amount = %s WHERE customer_id = %s"""
+                values = (
+                     neo_score, eligible_score ,customer_id
+                    )
         
+                cursor.execute(insert_query, values)
+                
+                response = {"status": "success","message": "Data saved successfully","neo_score" : neo_score,"eligible_score" : eligible_score}
+                #response = {"message": "Data saved successfully"}
+                return jsonify(response), 200
 
-        insert_query = """UPDATE customer_details SET existing_emi = %s, emi_amount = %s, industry = %s, age_of_business = %s, type_of_credit = %s, required_credit_amount = %s WHERE customer_id = %s"""
-        values = (
-             existing_emi, emi_amount, industry, age_of_business, type_of_credit, required_credit_amount,customer_id
-            )
-
-        cursor.execute(insert_query, values)
-        conn.commit()
-        
-        neo_score = get_neo_score(email)
-        print("neo_score:------------",neo_score)
-        eligible_score = get_eligible_amount(email)
-        print("eligible_score:------------",eligible_score)
-        #neo_score = randint(45, 65)
-        #eligible_score = (required_credit_amount * (70/100))
-        
-        insert_query = """UPDATE eligibility_details SET neo_score = %s, eligible_amount = %s WHERE customer_id = %s"""
-        values = (
-             neo_score, eligible_score ,customer_id
-            )
-
-        cursor.execute(insert_query, values)
-        
-        response = {"message": "Data saved successfully","neo_score" : neo_score,"eligible_score" : eligible_score}
-        #response = {"message": "Data saved successfully"}
-        return jsonify(response), 200
 
 
 ########################### API for pan verification ####################################
 
 @app.route('/pan_verification', methods=['POST'])
 def pan_verification():
-    mobile = request.json.get('mobile')
-    name = request.json.get('name')
-    pan = request.json.get('pan')
- 
-    cursor.execute("SELECT * FROM pan_details WHERE id = %s", (pan,))
-    pan_data = cursor.fetchone()
     
-    if pan_data:
-        cursor.execute("SELECT * FROM login_details WHERE mobile = %s AND name = %s", (mobile, name)) 
-        login_data = cursor.fetchall()    
-        cursor.execute("SELECT * FROM customer_details WHERE PAN = %s", (pan,))
-        customer_data = cursor.fetchone()
-        
-        if login_data and customer_data:
-            # Update pan_status to VERIFIED in customer_details table
-            cursor.execute("UPDATE customer_details SET pan_status = %s WHERE pan = %s",
-                           ('VERIFIED', pan))
-            conn.commit()          
-            response = {
-                'message': 'PAN status updated to VERIFIED'
-            }
+    request_data = request.get_json()
+	# Check if required fields are missing
+    required_fields = ['mobile', 'name', 'pan']
+    for field in required_fields:
+        if request_data[field] is None:
+            print({"message": "Kindly fill all the Details"})
+            return jsonify({"message": "Kindly fill all the Details"}), 400
         else:
-            cursor.execute("UPDATE customer_details SET pan_status = %s WHERE PAN = %s",
-                               ('UNVERIFIED', pan))
-            conn.commit()
+            mobile = request.json.get('mobile')
+            name = request.json.get('name')
+            pan = request.json.get('pan')
+         
+            cursor.execute("SELECT * FROM customer_details WHERE pan = %s", (pan,))
+            pan_data = cursor.fetchone()
             
-            response = {
-                'message': 'PAN status updated to UNVERIFIED'
-            }
-    else:
-        response = {
-            'message': 'PAN number not found',
-            'status': 'error'
-        }
-    
-    return jsonify(response)
+            if pan_data:
+                cursor.execute("SELECT * FROM login_details WHERE mobile = %s AND name = %s", (mobile, name)) 
+                login_data = cursor.fetchall()    
+                cursor.execute("SELECT * FROM customer_details WHERE PAN = %s", (pan,))
+                customer_data = cursor.fetchone()
+                
+                if login_data and customer_data:
+                    # Update pan_status to VERIFIED in customer_details table
+                    cursor.execute("UPDATE customer_details SET pan_status = %s WHERE pan = %s",
+                                   ('VERIFIED', pan))
+                    conn.commit()          
+                    response = {
+                        'message': 'PAN status updated to VERIFIED'
+                    }
+                else:
+                    cursor.execute("UPDATE customer_details SET pan_status = %s WHERE PAN = %s",
+                                       ('UNVERIFIED', pan))
+                    conn.commit()
+                    
+                    response = {
+                        'message': 'PAN status updated to UNVERIFIED'
+                    }
+            else:
+                response = {
+                    'message': 'PAN number not found',
+                    'status': 'error'
+                }
+            
+            return jsonify(response)
 
-########################### API for Generate PDF From HTML ####################################
-
+#####################################################################################################
 pdfkit_options = {
     'page-size': 'A4',
     'margin-top': '0mm',
@@ -887,127 +943,153 @@ pdfkit_options = {
     'margin-left': '0mm',
 }
 
-
-#pdfkit_config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')
+pdfkit_config = pdfkit.configuration(wkhtmltopdf="C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe")
 env = Environment(loader=FileSystemLoader('.'))
 neo_report_template = env.get_template('neo_report.html')
+from html2image import Html2Image
 
 @app.route('/generate_pdf', methods=['GET'])
 def generate_pdf():
     
-    data = request.get_json()
-    email = data['email']
-    cursor = conn.cursor()
-    
-    cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
-    custo_id = cursor.fetchone()
-    customer_id = custo_id[0]
-    print("customer_id:-----------",customer_id)
-    
-    
-    cursor.execute("""
-        SELECT ld.customer_id, ld.name, ld.email, ld.mobile,
-               cd.pan, cd.designation, cd.average_monthly_income, cd.average_monthly_expense, cd.existing_emi, cd.emi_amount,
-               cd.industry, cd.age_of_business, cd.type_of_credit, cd.required_credit_amount,
-               ed.eligible_amount, ed.neo_score
-        FROM login_details ld
-        JOIN customer_details cd ON ld.customer_id = cd.customer_id
-        JOIN eligibility_details ed ON ld.customer_id = ed.customer_id
-        WHERE ld.customer_id = %s;
-    """, (customer_id,))
-    
-    data = cursor.fetchone()
-    
-    if not data:
-        return jsonify({'error': 'Customer ID not found'}), 404
-    
-    # Generate a PDF report using the retrieved data
-    html_content = """
-    <html>
-    <head>
-        <title>Customer NEO Report</title>
-    </head>
-    <body>
-        <h1>NEO Credit Assesment Report</h1>
-        <p><strong>Customer ID :</strong> {}</p>
-        <p><strong>Name :</strong> {}</p>
-        <p><strong>Email :</strong> {}</p>
-        <p><strong>Mobile :</strong> {}</p>
-        <p><strong>PAN :</strong> {}</p>
-        <p><strong>Designation :</strong> {}</p>
-        <p><strong>Average Monthly Income :</strong> {}</p>
-        <p><strong>Average Monthly Expense :</strong> {}</p>
-        <p><strong>Existing EMI :</strong> {}</p>
-        <p><strong>EMI Amount :</strong> {}</p>
-        <p><strong>Industry :</strong> {}</p>
-        <p><strong>Age of Business :</strong> {}</p>
-        <p><strong>Type of Credit :</strong> {}</p>
-        <p><strong>Required Credit Amount :</strong> {}</p>
-        
-        <p><strong>Eligible Amount :</strong> {}</p>
-        <p><strong>NEO Score :</strong> {}</p>
-    </body>
-    </html>
-    """.format(*data) 
-    
-    # Parse the HTML content
-    soup = BeautifulSoup(html_content, 'html.parser')
-    data_dict = {}
-    for p in soup.find_all('p'):
-        key = p.strong.text.strip()
-        value = p.contents[-1].strip()
-        data_dict[key] = value
-    
-    personal_details_keys = [
-        'Customer ID :',
-        'Name :',
-        'Email :',
-        'Mobile :',
-    ]
-    
-    other_details_keys = [
-        'PAN :',
-        'Designation :',
-        'Average Monthly Income :',
-        'Average Monthly Expense :',
-        'Existing EMI :',
-        'EMI Amount :',
-        'Industry :',
-        'Age of Business :',
-        'Type of Credit :',
-        'Required Credit Amount :',
-        'Required Tenure :',
-        'Eligible Amount :',
-        'NEO Score :',
-    ]
-    
-    personal_details_table = PrettyTable()
-    personal_details_table.field_names = []
-    
-    other_details_table = PrettyTable()
-    other_details_table.field_names = []
-    
-    for key in personal_details_keys:
-        value = data_dict.get(key, '')
-        personal_details_table.add_row([key, value])
-    personal_details_table.header = False
-        
-    for key in other_details_keys:
-        value = data_dict.get(key, '')
-        other_details_table.add_row([key, value])
-    other_details_table.header = False
-    
-    template_data = {
-        'personal_details_table': personal_details_table.get_html_string(),
-        'other_details_table': other_details_table.get_html_string(),
-    }
+    #data = request.get_json()
+    required_fields = ["email"]
+    for field in required_fields:
+        if request.args.get(field) is None:
+            print({"message": "Kindly fill all the Details"})
+            return jsonify({"message": "Kindly fill all the Details"}), 400
+        else:
+            email = request.args.get('email')
+            cursor = conn.cursor()
+            
+            cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
+            custo_id = cursor.fetchone()
+            customer_id = custo_id[0]
+            print("customer_id:-----------",customer_id)
+            
+            
+            cursor.execute("""
+                SELECT ld.customer_id, ld.name, ld.email, ld.mobile,
+                       cd.pan, cd.designation, cd.average_monthly_income, cd.average_monthly_expense, cd.existing_emi, cd.emi_amount,
+                       cd.industry, cd.age_of_business, cd.type_of_credit, cd.required_credit_amount,
+                       ed.eligible_amount, ed.neo_score
+                FROM login_details ld
+                JOIN customer_details cd ON ld.customer_id = cd.customer_id
+                JOIN eligibility_details ed ON ld.customer_id = ed.customer_id
+                WHERE ld.customer_id = %s;
+            """, (customer_id,))
+            
+            data = cursor.fetchone()
+            print("data:-----------",data)
+            if not data:
+                return jsonify({'error': 'Customer ID not found'}), 404
+            
+            hti = Html2Image(output_path= os.getcwd() + "/static/reports/")
+            
+            # Generate a PDF report using the retrieved data
+            html_content = """
+            <html>
+            <head>
+                <title>Customer NEO Report</title>
+            </head>
+            <body>
+                <h1>NEO Credit Assesment Report</h1>
+                <p><strong>Customer ID :</strong> {}</p>
+                <p><strong>Name :</strong> {}</p>
+                <p><strong>Email :</strong> {}</p>
+                <p><strong>Mobile :</strong> {}</p>
+                <p><strong>PAN :</strong> {}</p>
+                <p><strong>Designation :</strong> {}</p>
+                <p><strong>Average Monthly Income :</strong> {}</p>
+                <p><strong>Average Monthly Expense :</strong> {}</p>
+                <p><strong>Existing EMI :</strong> {}</p>
+                <p><strong>EMI Amount :</strong> {}</p>
+                <p><strong>Industry :</strong> {}</p>
+                <p><strong>Age of Business :</strong> {}</p>
+                <p><strong>Type of Credit :</strong> {}</p>
+                <p><strong>Required Credit Amount :</strong> {}</p>
+                
+                <p><strong>Eligible Amount :</strong> {}</p>
+                <p><strong>NEO Score :</strong> {}</p>
+            </body>
+            </html>
+            """.format(*data) 
+            
+            # Parse the HTML content
+            soup = BeautifulSoup(html_content, 'html.parser')
+            data_dict = {}
+            for p in soup.find_all('p'):
+                key = p.strong.text.strip()
+                value = p.contents[-1].strip()
+                data_dict[key] = value
+            
+            personal_details_keys = [
+                'Customer ID :',
+                'Name :',
+                'Email :',
+                'Mobile :',
+            ]
+            
+            other_details_keys = [
+                'PAN :',
+                'Designation :',
+                'Average Monthly Income :',
+                'Average Monthly Expense :',
+                'Existing EMI :',
+                'EMI Amount :',
+                'Industry :',
+                'Age of Business :',
+                'Type of Credit :',
+                'Required Credit Amount :',
+                'Required Tenure :',
+                'Eligible Amount :',
+                'NEO Score :',
+            ]
+            
+            personal_details_table = PrettyTable()
+            personal_details_table.field_names = []
+            
+            other_details_table = PrettyTable()
+            other_details_table.field_names = []
+            
+            for key in personal_details_keys:
+                value = data_dict.get(key, '')
+                personal_details_table.add_row([key, value])
+            personal_details_table.header = False
+                
+            for key in other_details_keys:
+                value = data_dict.get(key, '')
+                other_details_table.add_row([key, value])
+            other_details_table.header = False
+            
+            template_data = {
+                'personal_details_table': personal_details_table.get_html_string(),
+                'other_details_table': other_details_table.get_html_string(),
+            }
+            
+            rendered_html = neo_report_template.render(data=template_data)   
+            #print("rendered_html:-----------",rendered_html)
+            #pdf_filename = f'NEO_report_{re.sub(r"[^a-zA-Z0-9]", "_", str(customer_id))}.pdf'
+            html_filename = f'NEO_report_{re.sub(r"[^a-zA-Z0-9]", "_", str(customer_id))}.html'
+            print("html_filename:-----------",html_filename)
+            #pdfkit.from_string(rendered_html, html_filename, configuration=pdfkit_config)
+            
+            with open("static/reports/" + html_filename, "w") as f:
+                f.write(rendered_html)
+            f.close()
+            
+            hti.screenshot(html_str=os.getcwd() + "/static/reports/" + html_filename , save_as = "NEO_report_"+f"{str(customer_id)}.jpg")
+            
+            url = request.url_root +"static/reports/" +  html_filename
+            #url1 = os.getcwd() + "/static/reports/" +  html_filename
+            url1 = os.getcwd() + "/static/reports/" + "NEO_report_"+f"{str(customer_id)}.jpg"
+            url_new = url1.replace('\\','/')
+            print("URL:---------",url_new , type(url_new))
+            #return redirect(url)
+            #return send_file(url_new)
+            return jsonify({'message': 'PDF report generated successfully', 'pdf_filename': str(url_new)}), 200
+            
 
-    rendered_html = neo_report_template.render(data=template_data)   
-    pdf_filename = f'NEO_report_{re.sub(r"[^a-zA-Z0-9]", "_", str(customer_id))}.pdf'
-    #pdfkit.from_string(rendered_html, pdf_filename, configuration=pdfkit_config, options=pdfkit_options)
     
-    return jsonify({'message': 'PDF report generated successfully', 'pdf_filename': pdf_filename}), 200
-
 @app.route('/get_score', methods=['POST'])
 def get_score():
     #try:
@@ -1035,9 +1117,10 @@ def get_score():
     eligibl_scor = neo[1]
     conn.commit()
     print("neo_score:----",neo_scor)
-    return {"neo_scor": neo_scor, "eligibl_scor":eligibl_scor}
-
+    return jsonify({"neo_scor": str(neo_scor), "eligibl_scor":str(eligibl_scor)})
+    
+    
+    
+    
 if __name__ == '__main__':  
     app.run() 
-
-
