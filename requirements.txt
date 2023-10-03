@@ -8,3 +8,4 @@ numpy
 prettytable
 pdfkit
 bs4
+html2image
