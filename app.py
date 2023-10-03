@@ -946,7 +946,7 @@ pdfkit_options = {
 #pdfkit_config = pdfkit.configuration(wkhtmltopdf="C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe")
 env = Environment(loader=FileSystemLoader('.'))
 neo_report_template = env.get_template('neo_report.html')
-from html2image import Html2Image
+#from html2image import Html2Image
 
 @app.route('/generate_pdf', methods=['GET'])
 def generate_pdf():
@@ -983,7 +983,7 @@ def generate_pdf():
             if not data:
                 return jsonify({'error': 'Customer ID not found'}), 404
             
-            hti = Html2Image(output_path= os.getcwd() + "/static/reports/")
+            #hti = Html2Image(output_path= os.getcwd() + "/static/reports/")
             
             # Generate a PDF report using the retrieved data
             html_content = """
@@ -1077,11 +1077,11 @@ def generate_pdf():
                 f.write(rendered_html)
             f.close()
             
-            hti.screenshot(html_str=os.getcwd() + "/static/reports/" + html_filename , save_as = "NEO_report_"+f"{str(customer_id)}.jpg")
+            #hti.screenshot(html_str=os.getcwd() + "/static/reports/" + html_filename , save_as = "NEO_report_"+f"{str(customer_id)}.jpg")
             
             url = request.url_root +"static/reports/" +  html_filename
-            #url1 = os.getcwd() + "/static/reports/" +  html_filename
-            url1 = os.getcwd() + "/static/reports/" + "NEO_report_"+f"{str(customer_id)}.jpg"
+            url1 = os.getcwd() + "/static/reports/" +  html_filename
+            #url1 = os.getcwd() + "/static/reports/" + "NEO_report_"+f"{str(customer_id)}.jpg"
             url_new = url1.replace('\\','/')
             print("URL:---------",url_new , type(url_new))
             #return redirect(url)
