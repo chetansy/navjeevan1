@@ -141,10 +141,10 @@ def get_neo_score(email):
 	#	saved_objects = pickle.load(f)
 	github_raw_url = 'https://github.com/chetansy/navjeevan1/blob/main/neo_score_model_and_transformers2.pkl'
 	response = requests.get(github_raw_url)
-
-	#if response.status_code == 200:
+	saved_objects = {}
+	if response.status_code == 200:
 	# Load the pickled data from the response content
-	saved_objects = pickle.loads(response.content)
+		saved_objects = pickle.loads(response.content)
 		
 	model = saved_objects['model']
 	encoder = saved_objects['encoder']
