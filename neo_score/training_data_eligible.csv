@@ -1,0 +1,51 @@
+designation,average_monthly_income,average_monthly_expense,existing_emi,emi_amount,industry,age_of_business,type_of_credit,required_credit_amount,cibil_score,neo_score,eligible_amount
+Self Employed,280000,471000,No,0,Private,9,Business Loan,2026000,711,59,3747000
+Self Employed,197000,454000,Yes,42288,Government,11,Business Loan,2872000,714,38,3439000
+Salaried,443000,332000,Yes,45459,Private,14,Business Loan,3951000,531,63,4663000
+Self Employed,433000,497000,No,0,Education,13,Business Loan,2396000,513,39,491000
+Self Employed,277000,402000,No,0,Private,6,Business Loan,2777000,539,46,3662000
+Self Employed,428000,111000,No,0,Government,13,Business Loan,3429000,522,51,3251000
+Salaried,478000,103000,No,0,Government,7,Business Loan,508000,613,49,4929000
+Salaried,157000,300000,No,0,Private,7,Business Loan,4146000,768,44,2198000
+Salaried,41000,35000,No,0,Private,10,Business Loan,4226000,537,50,1383000
+Retired,265000,120000,Yes,31013,Government,3,Business Loan,461000,700,61,1287000
+Retired,103000,432000,No,0,Private,7,Business Loan,1577000,612,40,44000
+Retired,27000,494000,Yes,10221,Private,14,Personal Loan,4026000,693,47,1158000
+Retired,78000,401000,Yes,28475,Government,11,Personal Loan,3694000,703,46,938000
+Retired,288000,219000,No,0,Private,6,Personal Loan,3031000,625,36,1110000
+Retired,480000,45000,No,0,Government,10,Personal Loan,1864000,610,40,4200000
+Retired,146000,263000,No,0,Government,15,Personal Loan,2384000,562,56,3729000
+Retired,425000,239000,Yes,30160,Private,14,Personal Loan,4516000,718,49,1621000
+Salaried,484000,88000,Yes,18960,Private,3,Personal Loan,2131000,627,58,4981000
+Self Employed,356000,216000,Yes,30202,Private,11,Home Loan,407000,660,60,3517000
+Self Employed,493000,43000,No,0,Government,3,Home Loan,3568000,537,40,1570000
+Salaried,421000,400000,No,0,Education,9,Home Loan,2659000,519,61,1390000
+Salaried,333000,435000,Yes,39719,Private,13,Home Loan,569000,647,62,2850000
+Self Employed,485000,108000,Yes,31253,Private,3,Home Loan,4023000,551,37,612000
+Self Employed,62000,476000,No,0,Private,10,Home Loan,1043000,666,62,1648000
+Salaried,206000,69000,No,0,Government,15,Home Loan,3451000,662,44,1853000
+Salaried,81000,304000,No,0,Education,6,Vehicle Loan,4645000,530,42,1583000
+Salaried,109000,166000,Yes,32428,Education,5,Vehicle Loan,4335000,755,42,231000
+Self Employed,424000,273000,No,0,Government,5,Vehicle Loan,676000,636,46,4512000
+Self Employed,240000,245000,Yes,10583,Private,8,Vehicle Loan,1123000,641,59,3230000
+Salaried,54000,399000,No,0,Private,9,Vehicle Loan,1369000,618,54,410000
+Self Employed,499000,305000,Yes,16788,Private,2,Vehicle Loan,1108000,776,45,302000
+Self Employed,91000,381000,No,0,Private,15,Vehicle Loan,2883000,732,53,4854000
+Self Employed,308000,434000,No,0,Private,2,Vehicle Loan,4589000,510,34,2844000
+Salaried,244000,396000,No,0,Private,9,OD / CC,2974000,537,50,1189000
+Salaried,109000,263000,No,0,Private,6,OD / CC,230000,585,45,4605000
+Self Employed,95000,100000,No,0,Private,10,OD / CC,605000,655,54,3478000
+Self Employed,118000,166000,No,0,Education,2,OD / CC,4314000,570,34,3768000
+Salaried,85000,213000,No,0,Education,11,OD / CC,4533000,591,60,389000
+Salaried,261000,224000,Yes,19564,Education,15,OD / CC,2543000,755,54,2922000
+Self Employed,429000,212000,Yes,23720,Education,8,OD / CC,4962000,644,60,2983000
+Salaried,161000,108000,No,0,Government,2,Loan Against Property,2704000,527,33,2410000
+Self Employed,217000,124000,Yes,20848,Government,10,Loan Against Property,2193000,686,51,2770000
+Self Employed,389000,45000,No,0,Education,7,Loan Against Property,3459000,543,59,1819000
+Self Employed,181000,478000,Yes,18143,Private,3,Loan Against Property,1395000,641,32,2103000
+Self Employed,500000,189000,No,0,Private,14,Loan Against Property,2545000,777,39,2502000
+Salaried,114000,344000,Yes,25821,Education,12,Loan Against Property,4367000,638,60,4040000
+Salaried,482000,318000,No,0,Private,13,Loan Against Property,4271000,691,39,1714000
+Salaried,457000,252000,No,0,Education,11,Loan Against Property,1933000,595,54,1021000
+Self Employed,143000,270000,Yes,30989,Private,11,Loan Against Property,4799000,683,64,3710000
+Salaried,244000,35000,Yes,12789,Government,3,Loan Against Property,1975000,695,44,4958000
