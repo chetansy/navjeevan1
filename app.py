@@ -136,10 +136,10 @@ def get_neo_score(email):
 	print("test4")
 	
 	# Loading later
-	#with open('neo_score_model_and_transformers2.pkl', 'rb') as f:
-	#	saved_objects = pickle.load(f, encoding='latin1')
+	with open('neo_score_model_and_transformers3.pkl', 'rb') as f:
+		saved_objects = pickle.load(f, encoding='latin1')
 	#saved_objects = pickle.load(open('neo_score_model_and_transformers2.pkl', 'rb'))
-	saved_objects = joblib.load('neo_score_model_and_transformers2.sav')
+	#saved_objects = joblib.load('neo_score_model_and_transformers2.sav')
 	model = saved_objects['model']
 	print("model:------",model)
 	encoder = saved_objects['encoder']
