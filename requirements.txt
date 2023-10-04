@@ -9,4 +9,3 @@ prettytable
 pdfkit
 bs4
 html2image
-pickletools
