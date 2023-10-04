@@ -25,7 +25,7 @@ from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 import pickle
 import joblib
 from io import BytesIO
-
+import pickletools
 
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
