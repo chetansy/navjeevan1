@@ -138,17 +138,16 @@ def get_neo_score(email):
 	# Loading later
 	#with open('neo_score_model_and_transformers2.pkl', 'rb') as f:
 	#	saved_objects = pickle.load(f)
-	with open('https://github.com/chetansy/navjeevan1/blob/main/neo_score_model_and_transformers2.pkl', 'rb') as f:
-    		saved_objects = pickle.loads(f)
-    		#pickletools.dis(saved_objects)
-	#saved_objects = pickle.load(open('neo_score_model_and_transformers2.pkl', 'rb'))
-	#saved_objects = joblib.load('neo_score_model_and_transformers2.sav')
-	model = saved_objects['model']
-	print("model:------",model)
-	encoder = saved_objects['encoder']
-	print("encoder:----",encoder)
-	scaler = saved_objects['scaler']
-	print("scaler:-------",scaler)
+	github_raw_url = 'https://github.com/chetansy/navjeevan1/blob/main/neo_score_model_and_transformers2.pkl'
+    	response = requests.get(github_raw_url)
+    
+    	if response.status_code == 200:
+        	# Load the pickled data from the response content
+        	saved_objects = pickle.loads(response.content)
+
+        	model = saved_objects['model']
+        	encoder = saved_objects['encoder']
+        	scaler = saved_objects['scaler']
 	
 	# Define the categorical columns
 	categorical_columns = ['designation', 'existing_emi', 'type_of_credit', 'industry']
