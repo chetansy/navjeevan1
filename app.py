@@ -146,9 +146,9 @@ def get_neo_score(email):
 		# Load the pickled data from the response content
 		saved_objects = pickle.loads(response.content)
 		
-		model = saved_objects['model']
-		encoder = saved_objects['encoder']
-		scaler = saved_objects['scaler']
+	model = saved_objects['model']
+	encoder = saved_objects['encoder']
+	scaler = saved_objects['scaler']
 	
 	# Define the categorical columns
 	categorical_columns = ['designation', 'existing_emi', 'type_of_credit', 'industry']
