@@ -3,7 +3,7 @@ flask
 flask_mail
 psycopg2
 pandas
-scikit-learn==1.0.2
+scikit-learn==0.24.2
 numpy
 prettytable
 pdfkit
