@@ -45,7 +45,7 @@ app.config["MAIL_SERVER"]='smtp.googlemail.com'
 app.config["MAIL_USE_TLS"] = True      
 app.config["MAIL_PORT"] = 587      
 app.config["MAIL_USERNAME"] = 'navjeevan.creditsiddhi@gmail.com'  
-app.config['MAIL_PASSWORD'] = 'klky wlqr yjut duhi'  
+app.config['MAIL_PASSWORD'] = 'pghz feck vtfx lzax'  
 
 #app.secret_key = 'root'
 logging.basicConfig(level=logging.INFO)
