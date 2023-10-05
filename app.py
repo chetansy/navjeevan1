@@ -137,7 +137,7 @@ def get_neo_score(email):
 	print("test4")
 	
 	# Loading later
-	with open('neo_score_model_and_transformers2.pkl', 'rb') as f:
+	with open('https://github.com/chetansy/navjeevan1/blob/main/neo_score_model_and_transformers2.pkl', 'rb') as f:
 		saved_objects = pickle.loads(f)
 	#with open('neo_score_model_and_transformers2.json',"r") as f:
 	#	saved_objects = json.load(f)
