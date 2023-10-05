@@ -426,7 +426,7 @@ def email_sendotp1(data):
         conn.commit()
         #msg = Message('OTP', sender='pallaviuike140@gmail.com', recipients=[email])
         msg = Message("Send Mail Tutorial!",
-		  sender="chetan0yewale@gmail.com",
+		  sender="navjeevan.creditsiddhi@gmail.com",
 		  recipients=[email])
         
         msg.body = "Your one-time password (OTP) is " + " " + str(email_otp)
