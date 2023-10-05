@@ -140,7 +140,7 @@ def get_neo_score(email):
 	#with open('neo_score_model_and_transformers2.pkl', 'rb') as f:
 	#	saved_objects = pickle.loads(f)
 	with open('neo_score_model_and_transformers2.json',encoding="utf-8") as f:
-		saved_objects = pickle.load(f)
+		saved_objects = json.load(f)
 	#saved_objects = pickle.loads("neo_score_model_and_transformers2.pickle")
 	#URI = 'https://github.com/chetansy/navjeevan1/blob/main/neo_score_model_and_transformers2.pkl'
 	#saved_objects = joblib.load(BytesIO(requests.get(URI).content))
