@@ -890,7 +890,7 @@ def save_customer_details2():
 			perc = randint(60, 75)
 			print("perc:------------",perc,type(perc))
 			eligible_score = (required_credit_amount * int(67/100))
-			print("eligible_score:------------",eligible_score)
+			print("eligible_score:------------",eligible_score,type(eligible_score))
 			
 			insert_query = """UPDATE eligibility_details SET neo_score = %s, eligible_amount = %s WHERE customer_id = %s"""
 			#values = (neo_score, str(eligible_score) ,customer_id)
