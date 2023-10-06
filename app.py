@@ -893,8 +893,10 @@ def save_customer_details2():
 			print("eligible_score:------------",eligible_score)
 			
 			insert_query = """UPDATE eligibility_details SET neo_score = %s, eligible_amount = %s WHERE customer_id = %s"""
-			values = (neo_score, str(eligible_score) ,customer_id)
-			
+			#values = (neo_score, str(eligible_score) ,customer_id)
+			values = (
+			neo_score, eligible_score, customer_id
+			)
 			cursor.execute(insert_query, values)
 			
 			response = {"status": "success","message": "Data saved successfully","neo_score" : neo_score,"eligible_score" : eligible_score}
