@@ -862,7 +862,7 @@ def save_customer_details2():
 			industry  = data['industry']
 			age_of_business  = data['age_of_business']
 			type_of_credit  = data['type_of_credit']
-			required_credit_amount  = data['required_credit_amount']
+			required_credit_amount  = int(data['required_credit_amount'])
 			
 			print("existing_emi:-----",existing_emi)
 			print("emi_amount:-----",emi_amount)
@@ -895,7 +895,7 @@ def save_customer_details2():
 			insert_query = """UPDATE eligibility_details SET neo_score = %s, eligible_amount = %s WHERE customer_id = %s"""
 			#values = (neo_score, str(eligible_score) ,customer_id)
 			values = (
-			neo_score, int(eligible_score), customer_id
+			neo_score, eligible_score, customer_id
 			)
 			cursor.execute(insert_query, values)
 			
