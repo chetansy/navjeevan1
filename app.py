@@ -834,73 +834,71 @@ def save_customer_details1():
 @app.route('/save_customer_details22', methods=['POST'])
 def save_customer_details2():
     #try:
-        data = request.get_json()
-        
-        # Check if other required fields are missing
-        required_fields = ['existing_emi', 'emi_amount', 'industry', 'age_of_business', 'type_of_credit', 'required_credit_amount']
-        for field in required_fields:
-            if data[field] is None:
-                print({"message": "Kindly fill all the Details"})
-                return jsonify({"status": "error","message": "Kindly fill all the Details"}), 400
-            else:
-                email1 = data['email']
-                print("email1:---------",email1)
-                try:
-                    email = email1["email"]
-                except Exception as e:
-                    print("in save_custmr_1:-----",e)
-                    email = email1
-                print("email:-----------",email)
-                ### Extracting customer_id from email ###
-                cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
-                custo_id = cursor.fetchone()
-                customer_id = custo_id[0]
-                print("customer_id:-----------",customer_id)
-                
-                existing_emi  = data['existing_emi']
-                emi_amount  = data['emi_amount']
-                industry  = data['industry']
-                age_of_business  = data['age_of_business']
-                type_of_credit  = data['type_of_credit']
-                required_credit_amount  = data['required_credit_amount']
-                
-                print("existing_emi:-----",existing_emi)
-                print("emi_amount:-----",emi_amount)
-                print("industry:-----",industry)
-                print("age_of_business:-----",age_of_business)
-                print("type_of_credit:-----",type_of_credit)
-                print("required_credit_amount:-----",required_credit_amount)
-                
-        
-                insert_query = """UPDATE customer_details SET existing_emi = %s, emi_amount = %s, industry = %s, age_of_business = %s, type_of_credit = %s, required_credit_amount = %s WHERE customer_id = %s"""
-                values = (
-                     existing_emi, emi_amount, industry, age_of_business, type_of_credit, required_credit_amount,customer_id
-                    )
-        
-                cursor.execute(insert_query, values)
-                conn.commit()
-                
-                #neo_score = get_neo_score(email)
-                #print("neo_score:------------",neo_score)
-                #eligible_score = get_eligible_amount(email)
-                #print("eligible_score:------------",eligible_score)
-                neo_score = randint(45, 65)
-		print("neo_score:------------",neo_score)
-
-		perc = randint(60, 75)
-                eligible_score = (required_credit_amount * (perc/100))
-                print("eligible_score:------------",eligible_score)
+	data = request.get_json()
+	
+	# Check if other required fields are missing
+	required_fields = ['existing_emi', 'emi_amount', 'industry', 'age_of_business', 'type_of_credit', 'required_credit_amount']
+	for field in required_fields:
+	    if data[field] is None:
+		print({"message": "Kindly fill all the Details"})
+		return jsonify({"status": "error","message": "Kindly fill all the Details"}), 400
+	    else:
+		email1 = data['email']
+		print("email1:---------",email1)
+		try:
+		    email = email1["email"]
+		except Exception as e:
+		    print("in save_custmr_1:-----",e)
+		    email = email1
+		print("email:-----------",email)
+		### Extracting customer_id from email ###
+		cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
+		custo_id = cursor.fetchone()
+		customer_id = custo_id[0]
+		print("customer_id:-----------",customer_id)
 		
-                insert_query = """UPDATE eligibility_details SET neo_score = %s, eligible_amount = %s WHERE customer_id = %s"""
-                values = (
-                     neo_score, eligible_score ,customer_id
-                    )
-        
-                cursor.execute(insert_query, values)
-                
-                response = {"status": "success","message": "Data saved successfully","neo_score" : neo_score,"eligible_score" : eligible_score}
-                #response = {"message": "Data saved successfully"}
-                return jsonify(response), 200
+		existing_emi  = data['existing_emi']
+		emi_amount  = data['emi_amount']
+		industry  = data['industry']
+		age_of_business  = data['age_of_business']
+		type_of_credit  = data['type_of_credit']
+		required_credit_amount  = data['required_credit_amount']
+		
+		print("existing_emi:-----",existing_emi)
+		print("emi_amount:-----",emi_amount)
+		print("industry:-----",industry)
+		print("age_of_business:-----",age_of_business)
+		print("type_of_credit:-----",type_of_credit)
+		print("required_credit_amount:-----",required_credit_amount)
+		
+	
+		insert_query = """UPDATE customer_details SET existing_emi = %s, emi_amount = %s, industry = %s, age_of_business = %s, type_of_credit = %s, required_credit_amount = %s WHERE customer_id = %s"""
+		values = (
+		     existing_emi, emi_amount, industry, age_of_business, type_of_credit, required_credit_amount,customer_id
+		    )
+	
+		cursor.execute(insert_query, values)
+		conn.commit()
+		
+		#neo_score = get_neo_score(email)
+		#print("neo_score:------------",neo_score)
+		#eligible_score = get_eligible_amount(email)
+		#print("eligible_score:------------",eligible_score)
+		neo_score = randint(45, 65)
+		print("neo_score:------------",neo_score)
+	
+		perc = randint(60, 75)
+		eligible_score = (required_credit_amount * (perc/100))
+		print("eligible_score:------------",eligible_score)
+		
+		insert_query = """UPDATE eligibility_details SET neo_score = %s, eligible_amount = %s WHERE customer_id = %s"""
+		values = (neo_score, eligible_score ,customer_id)
+	
+		cursor.execute(insert_query, values)
+		
+		response = {"status": "success","message": "Data saved successfully","neo_score" : neo_score,"eligible_score" : eligible_score}
+		#response = {"message": "Data saved successfully"}
+		return jsonify(response), 200
 
 
 
