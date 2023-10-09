@@ -1094,10 +1094,10 @@ def generate_pdf():
 			print("html_filename:-----------",html_filename)
 			#pdfkit.from_string(rendered_html, html_filename, configuration=pdfkit_config)
 
-			directory = os.getcwd() + "/static/reports/" + html_filename
-			direct = directory.replace('\\','/')
-			if not os.path.exists(direct):
-    				os.makedirs(direct)
+			directory = "./static/reports/" + html_filename
+			
+			if not os.path.exists(directory):
+    				os.makedirs(directory)
 				
 			with open(direct, "w") as f:
 				f.write(rendered_html)
@@ -1113,7 +1113,7 @@ def generate_pdf():
 			print("URL:---------",url_new , type(url_new))
 			#return redirect(url)
 			#return send_file(url_new)
-			return jsonify({'message': 'PDF report generated successfully', 'pdf_filename': str(direct)}), 200
+			return jsonify({'message': 'PDF report generated successfully', 'pdf_filename': str(directory)}), 200
             
 
     
