@@ -1094,7 +1094,7 @@ def generate_pdf():
 			print("html_filename:-----------",html_filename)
 			#pdfkit.from_string(rendered_html, html_filename, configuration=pdfkit_config)
 			
-			with open(os.getcwd() + "/static/reports/" + html_filename, "w") as f:
+			with open(os.getcwd() + "./static/reports/" + html_filename, "w") as f:
 				f.write(rendered_html)
 			f.close()
 			
