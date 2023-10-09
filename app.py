@@ -465,7 +465,7 @@ def signup_with_credentials(data):
         
         try:
             current_date = datetime.now()
-            cursor.execute("INSERT INTO login_details (name, email, mobile, password, last_password_change) VALUES (%s, %s, %s, %s, %s)", (name, email, mobile, _hashed_password, current_date))
+            cursor.execute("INSERT INTO login_details (name, email, mobile, password, last_password_change) VALUES (%s, %s, %s, %s, %s)", (name, email.lower(), mobile, _hashed_password, current_date))
             conn.commit()
             session['customer_id'] = get_customer_id_for_user(email)
             response_data = {"message": "User signup successfully"}
