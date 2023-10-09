@@ -774,57 +774,55 @@ def retrieve():
 
 @app.route('/save_customer_details1', methods=['POST'])
 def save_customer_details1():
-
-    try:
-        data = request.get_json()
-        required_fields = ['occupation', 'email', 'pan', 'monthly_income','monthly_expenses']
-         
-        for field in required_fields:
-            if data[field] is None:
-                print({"message": "Kindly fill all the Details"})
-                return jsonify({"status": "error","message": "Kindly fill all the Details"}), 400
-            else:
-                print("EMAIL_FROM_LOGIN:-----------",data['email'])
-                
-                email = data['email']
-                ### Extracting customer_id from email ###
-                cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
-                custo_id = cursor.fetchone()
-                print("custo_id:----", custo_id[0])
-                customer_id = custo_id[0]
-                
-                if customer_id is None:
-                    return jsonify({"status": "error","message": "Customer ID not found in session"}), 400
-                
-                app.logger.debug(f"customer_id: {customer_id}")
-                pan = data['pan']
-                occupation = data['occupation']
-                monthly_income  = data['monthly_income']
-                monthly_expenses  = data['monthly_expenses']
-                
-                print("customer_id:----" ,customer_id)
-                print("pan:----" ,pan)
-                print("occupation:----" ,occupation)
-                print("monthly_income:----" ,monthly_income)
-                print("monthly_expenses:----" ,monthly_expenses)
-                
-                insert_query = """UPDATE public.customer_details SET pan = %s, designation = %s,average_monthly_income = %s,average_monthly_expense = %s WHERE customer_id = %s"""
-                values = (
-                     pan, occupation ,monthly_income, monthly_expenses,customer_id
-                    )
-        
-                cursor.execute(insert_query, values)
-                conn.commit()
-        
-                response = {"status": "success","message": "Data saved successfully"}
-                
-                return jsonify(response), 200
-
-    except Exception as e:
-        logging.error(f"Exception: {e}")
-        conn.rollback()  # Rollback changes to the database
-        error_response = {"error": str(e)}
-        return jsonify(error_response), 500
+	
+	try:
+		data = request.get_json()
+		
+		if data.get('pan') is None or data.get('occupation') is None or data.get('monthly_income') is None or data.get('monthly_expenses') is None:
+			print({"message": "Each field need to be filled"})
+			return jsonify({"status": "error","message": "Each field need to be filled"}), 400
+		else:
+		
+			print("EMAIL_FROM_LOGIN:-----------",data['email'])
+			email = data['email']
+			### Extracting customer_id from email ###
+			cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
+			custo_id = cursor.fetchone()
+			print("custo_id:----", custo_id[0])
+			customer_id = custo_id[0]
+			
+			if customer_id is None:
+				return jsonify({"status": "error","message": "Customer ID not found in session"}), 400
+			
+			app.logger.debug(f"customer_id: {customer_id}")
+			pan = data['pan']
+			occupation = data['occupation']
+			monthly_income  = data['monthly_income']
+			monthly_expenses  = data['monthly_expenses']
+			
+			print("customer_id:----" ,customer_id)
+			print("pan:----" ,pan)
+			print("occupation:----" ,occupation)
+			print("monthly_income:----" ,monthly_income)
+			print("monthly_expenses:----" ,monthly_expenses)
+			
+			insert_query = """UPDATE public.customer_details SET pan = %s, designation = %s,average_monthly_income = %s,average_monthly_expense = %s WHERE customer_id = %s"""
+			values = (
+			pan, occupation ,monthly_income, monthly_expenses,customer_id
+			)
+			
+			cursor.execute(insert_query, values)
+			conn.commit()
+			
+			response = {"status": "success","message": "Data saved successfully"}
+			
+			return jsonify(response), 200
+	
+	except Exception as e:
+		logging.error(f"Exception: {e}")
+		conn.rollback()  # Rollback changes to the database
+		error_response = {"error": str(e)}
+		return jsonify(error_response), 500
     
 
         
