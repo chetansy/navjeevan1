@@ -1094,7 +1094,7 @@ def generate_pdf():
 			print("html_filename:-----------",html_filename)
 			#pdfkit.from_string(rendered_html, html_filename, configuration=pdfkit_config)
 
-			with open(html_filename, "w") as f:
+			with open("static/reports/" +  html_filename, "w") as f:
 				f.write(rendered_html)
 			f.close()
 			
@@ -1103,8 +1103,8 @@ def generate_pdf():
 			url = request.url_root +"static/reports/" +  html_filename
 			#url1 = os.getcwd() + "/static/reports/" +  html_filename
 			url_new = f"https://github.com/chetansy/navjeevan1/{html_filename}"
-			#url1 = os.getcwd() + "/static/reports/" + "NEO_report_"+f"{str(customer_id)}.jpg"
-			#url_new = url1.replace('\\','/')
+			url1 = os.getcwd() + "/static/reports/" + "NEO_report_"+f"{str(customer_id)}.jpg"
+			url_new = url1.replace('\\','/')
 			print("URL:---------",url_new , type(url_new))
 			#return redirect(url)
 			#return send_file(url_new)
