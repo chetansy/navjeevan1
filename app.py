@@ -336,7 +336,10 @@ def signup():
 			
 			email = request_data.get('email')
 			mobile = request_data.get('mobile')
-			
+			password = request_data.get('password')
+                	password_pattern = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$"
+	                if re.match(password_pattern, password) is None:                            # Returns None
+	                    return jsonify({"status": "error", "message": "Password should contain At least 1 uppercase ,1 Lowercase, 1 digit, 1 special character"}) 
 			if re.fullmatch(regex, email):  
 				print("The given mail is valid")  
 				if mobile and len(str(mobile)) == 10:
