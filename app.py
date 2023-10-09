@@ -325,7 +325,6 @@ def login():
 def signup():
 	request_data = request.json
 	data = request.get_json()
-	required_fields = ['name', 'email', 'mobile', 'password']
 	
 	if data.get('email') is None or data.get('mobile') is None or data.get('name') is None or data.get('password') is None:
 		print({"message": "Each field need to be filled"})
@@ -337,9 +336,10 @@ def signup():
 			email = request_data.get('email')
 			mobile = request_data.get('mobile')
 			password = request_data.get('password')
-                	password_pattern = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$"
-	                if re.match(password_pattern, password) is None:                            # Returns None
-	                    return jsonify({"status": "error", "message": "Password should contain At least 1 uppercase ,1 Lowercase, 1 digit, 1 special character"}) 
+			
+			password_pattern = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$"
+			if re.match(password_pattern, password) is None:                            # Returns None
+				return jsonify({"status": "error", "message": "Password should contain At least 1 uppercase ,1 Lowercase, 1 digit, 1 special character"}) 
 			if re.fullmatch(regex, email):  
 				print("The given mail is valid")  
 				if mobile and len(str(mobile)) == 10:
@@ -350,7 +350,7 @@ def signup():
 					
 					if mobile_exists(mobile):
 						return jsonify({"message": "Mobile number already exists"}), 400
-						
+					
 					signup_result = signup_with_credentials(request_data)
 					print("signup_result:------------",signup_result['message'])
 					if signup_result['message'] == "User signup successfully" :
@@ -361,8 +361,8 @@ def signup():
 							
 							print("getting email:----")
 							email_sendotp1(request_data)
-				
-						return jsonify(signup_result)
+					
+					return jsonify(signup_result)
 				else:
 					return jsonify({"status": "error", "message": "Invalid mobile number provided."})
 			else:  
