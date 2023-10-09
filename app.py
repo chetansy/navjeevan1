@@ -1099,7 +1099,7 @@ def generate_pdf():
 			if not os.path.exists(directory):
     				os.makedirs(directory)
 				
-			with open(direct, "w") as f:
+			with open(directory, "w") as f:
 				f.write(rendered_html)
 			f.close()
 			
