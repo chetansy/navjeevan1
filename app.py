@@ -329,7 +329,7 @@ def signup():
 	
 	if data.get('email') is None or data.get('mobile') is None or data.get('name') is None or data.get('password') is None:
 		print({"message": "Each field need to be filled"})
-		return jsonify({"message": "Email and mobile cannot be None"}), 400
+		return jsonify({"message": "Each field need to be filled"}), 400
 	else:
 		try:
 			regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')  
