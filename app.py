@@ -1093,13 +1093,18 @@ def generate_pdf():
 			html_filename = f'NEO_report_{re.sub(r"[^a-zA-Z0-9]", "_", str(customer_id))}.html'
 			print("html_filename:-----------",html_filename)
 			#pdfkit.from_string(rendered_html, html_filename, configuration=pdfkit_config)
-			
-			with open("./static/reports/" + html_filename, "w") as f:
+
+			directory = os.getcwd() + "/static/reports/" + html_filename
+			direct = directory.replace('\\','/')
+			if not os.path.exists(direct):
+    				os.makedirs(direct)
+				
+			with open(direct, "w") as f:
 				f.write(rendered_html)
 			f.close()
 			
 			#hti.screenshot(html_str=os.getcwd() + "/static/reports/" + html_filename , save_as = "NEO_report_"+f"{str(customer_id)}.jpg")
-			
+
 			url = request.url_root +"static/reports/" +  html_filename
 			#url1 = os.getcwd() + "/static/reports/" +  html_filename
 			url_new = "https://github.com/chetansy/navjeevan1/static/reports/" + html_filename
@@ -1108,7 +1113,7 @@ def generate_pdf():
 			print("URL:---------",url_new , type(url_new))
 			#return redirect(url)
 			#return send_file(url_new)
-			return jsonify({'message': 'PDF report generated successfully', 'pdf_filename': str(url_new)}), 200
+			return jsonify({'message': 'PDF report generated successfully', 'pdf_filename': str(direct)}), 200
             
 
     
