@@ -1094,7 +1094,7 @@ def generate_pdf():
 			print("html_filename:-----------",html_filename)
 			#pdfkit.from_string(rendered_html, html_filename, configuration=pdfkit_config)
 
-			directory = "https://github.com/chetansy/navjeevan1/"+ "raw/main" +"/static/reports/" + html_filename
+			directory = "https://github.com/chetansy/navjeevan1/"+ "tree/main" +"/static/reports/" + html_filename
 			
 			if not os.path.exists(directory):
     				os.makedirs(directory)
@@ -1107,7 +1107,7 @@ def generate_pdf():
 
 			url = request.url_root +"static/reports/" +  html_filename
 			#url1 = os.getcwd() + "/static/reports/" +  html_filename
-			url_new = "https://github.com/chetansy/navjeevan1/"+ "raw/main" +"/static/reports/" + html_filename
+			url_new = "https://github.com/chetansy/navjeevan1/"+ "tree/main" +"/static/reports/" + html_filename
 			#url1 = os.getcwd() + "/static/reports/" + "NEO_report_"+f"{str(customer_id)}.jpg"
 			#url_new = url1.replace('\\','/')
 			print("URL:---------",url_new , type(url_new))
