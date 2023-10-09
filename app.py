@@ -327,8 +327,8 @@ def signup():
 	data = request.get_json()
 	required_fields = ['name', 'email', 'mobile', 'password']
 	
-	if data.get('email') is None or data.get('mobile') is None:
-	        print({"message": "Email and mobile cannot be None"})
+	if data.get('email') is None or data.get('mobile') is None or data.get('name') is None or data.get('password') is None:
+	        print({"message": "Each field need to be filled"})
 	        return jsonify({"message": "Email and mobile cannot be None"}), 400
 	else:
 		try:
