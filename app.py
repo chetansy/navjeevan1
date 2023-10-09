@@ -1113,7 +1113,7 @@ def generate_pdf():
 			print("URL:---------",url_new , type(url_new))
 			#return redirect(url)
 			#return send_file(url_new)
-			return jsonify({'message': 'PDF report generated successfully', 'pdf_filename': str(directory)}), 200
+			return jsonify({'message': 'PDF report generated successfully', 'pdf_filename': str(url_new)}), 200
             
 
     
