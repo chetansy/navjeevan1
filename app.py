@@ -866,7 +866,7 @@ def save_customer_details1():
 			
 			insert_query = """UPDATE public.customer_details SET pan = %s, designation = %s,average_monthly_income = %s,average_monthly_expense = %s WHERE customer_id = %s"""
 			values = (
-			pan, occupation ,monthly_income, monthly_expenses,customer_id
+			pan.upper(), occupation ,monthly_income, monthly_expenses,customer_id
 			)
 			
 			cursor.execute(insert_query, values)
