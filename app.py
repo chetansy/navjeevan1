@@ -520,7 +520,7 @@ def regenerate_mail_otp():
 	print("email:----",request.json.get('email'))
 	try:
 		#email = request.args.get('email')
-		data = request.json.get()
+		data = request.json.get('email')
 		
 		email1 = data['email']
 		print("email1:---------",email1)
