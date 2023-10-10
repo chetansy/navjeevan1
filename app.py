@@ -513,7 +513,50 @@ def logout():
     print("Logged out successfully!")
     return redirect(url_for('login'))
 
-     
+############################  API for Regenerate Email OTP  ###########################
+@app.route('/regenerate_email_otp',methods = ["POST"])
+def regenerate_mail_otp():
+	request.args.get('email')
+	print("email:----",request.args.get('email'))
+	try:
+		email = request.args.get('email')
+		#customer_id = session.get('customer_id')
+		
+		if not email:
+			raise ValueError("Invalid email address provided.")
+		email_otp = randint(100000, 999999)
+		print("email_otp:----",email_otp)
+		cursor.execute(
+		"UPDATE public.login_details "
+		"SET email_otp = %s, email_otp_status = 'SENT', email_otp_generated_date_time = %s "
+		"WHERE email = %s", 
+		(email_otp, datetime.now(), email)
+		)
+		conn.commit()
+		#msg = Message('OTP', sender='pallaviuike140@gmail.com', recipients=[email])
+		msg = Message("Send Mail Tutorial!",
+		sender="navjeevan.creditsiddhi@gmail.com",
+		recipients=[email])
+		
+		msg.body = "Your one-time password (OTP) is " + " " + str(email_otp)
+		print("getting erorr:--------------------",msg.body)
+		mail.send(msg)
+		logging.info(f"OTP sent to registered email: {email}")
+		print(f"OTP sent to registered email: {email}")
+		response_data = {"status": "success", "message": "OTP sent successfully."}
+		return response_data
+		
+	except ValueError as ve:
+		logging.error(f"ValueError: {ve}")
+		response_data = {"status": "error", "message": str(ve)}
+		return response_data
+	
+	except Exception as e:
+		logging.error(f"Exception: {e}")
+		response_data = {"status": "error", "message": "An unexpected error occurred."}
+		return response_data
+
+
 ########################### API for Mobile OTP verification ####################################
 @app.route('/otp-verification', methods=['POST'])
 def otp_verification():
