@@ -520,7 +520,15 @@ def regenerate_mail_otp():
 	print("email:----",request.json.get('email'))
 	try:
 		#email = request.args.get('email')
-		email = request.json.get('email')
+		data = request.json.get()
+		
+		email1 = data['email']
+		print("email1:---------",email1)
+		try:
+			email = email1["email"]
+		except Exception as e:
+			print("in save_custmr_1:-----",e)
+			email = email1
 		#customer_id = session.get('customer_id')
 		
 		if not email:
@@ -546,7 +554,7 @@ def regenerate_mail_otp():
 		print(f"OTP sent to registered email: {email}")
 		response_data = {"status": "success", "message": "OTP sent successfully."}
 		return response_data
-		
+	
 	except ValueError as ve:
 		logging.error(f"ValueError: {ve}")
 		response_data = {"status": "error", "message": str(ve)}
