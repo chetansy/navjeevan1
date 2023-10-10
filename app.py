@@ -516,10 +516,11 @@ def logout():
 ############################  API for Regenerate Email OTP  ###########################
 @app.route('/regenerate_email_otp',methods = ["POST"])
 def regenerate_mail_otp():
-	request.args.get('email')
-	print("email:----",request.args.get('email'))
+	
+	print("email:----",request.json.get('email'))
 	try:
-		email = request.args.get('email')
+		#email = request.args.get('email')
+		email = request.json.get('email')
 		#customer_id = session.get('customer_id')
 		
 		if not email:
