@@ -703,7 +703,7 @@ def change_forgot_password():
 			print("email:------------",email)
 			print("new_password:------------",new_password)
 			print("confirm_password:------------",confirm_password)
-				
+			
 			password = request_data.get('password')
 			
 			password_pattern = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$"
@@ -717,29 +717,34 @@ def change_forgot_password():
 			
 			
 			if new_password != confirm_password:
-				raise ValueError("NewPassword and ConfirmPassword does not match")
+				#raise ValueError("NewPassword and ConfirmPassword does not match")
+				return jsonify({"status": "error", "message": "NewPassword and ConfirmPassword does not match"})
 			
 			cursor.execute('SELECT email FROM public.login_details WHERE email = %s', (email,))
 			account = cursor.fetchone()
 			if not account:
-				raise ValueError("Invalid mobile number")
+				#raise ValueError("Invalid mobile number")
+				return jsonify({"status": "error", "message": "Invalid email number."})
 			print("account:------------",type(account[0]),account[0])
 			db_email = account[0]
 			
 			cursor.execute('SELECT mobile FROM public.login_details WHERE mobile = %s', (mobile,))
 			account1 = cursor.fetchone()
 			if not account1:
-				raise ValueError("Invalid mobile number")
+				#raise ValueError("Invalid mobile number")
+				return jsonify({"status": "error", "message": "Invalid mobile number."})
 			print("account1:------------",type(account1[0]),account1[0])
 			db_mobile = int(account1[0])
 			
 			if email == db_email:
 				if mobile == db_mobile:
 					if not new_password:
-						raise ValueError("NewPassword is missing or None.")
+						#raise ValueError("NewPassword is missing or None.")
+						return jsonify({"status": "error", "message": "NewPassword is missing or None."})
 					
 					if not is_valid_password(new_password):
-						raise ValueError("Invalid password. Password does not meet policy requirements.")
+						#raise ValueError("Invalid password. Password does not meet policy requirements.")
+						return jsonify({"status": "error", "message": "Invalid password. Password does not meet policy requirements."})
 					
 					_hashed_password = generate_password_hash(new_password)
 					cursor.execute(
@@ -749,9 +754,11 @@ def change_forgot_password():
 					conn.commit()
 					return jsonify({"status": "success", "message": "Password updated successfully!"})
 				else:
-					raise ValueError("Invalid Mobile")
+					#raise ValueError("Invalid Mobile")
+					return jsonify({"status": "error", "message": "Invalid Mobile Number."})
 			else:
-				raise ValueError("Invalid Email")
+				#raise ValueError("Invalid Email")
+				return jsonify({"status": "error", "message": "Invalid Email ID."})
 	
 	except ValueError as ve:
 		logging.error(f"ValueError: {ve}")
