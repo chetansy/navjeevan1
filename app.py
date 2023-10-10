@@ -660,7 +660,7 @@ def email_otp_verification():
             if difference_in_minutes > 10:
                 cursor.execute("UPDATE public.login_details SET email_otp_status = 'EXPIRED' WHERE email = %s", (email,))
                 conn.commit()
-                return jsonify({"status": "error", "message": "OTP is expired. Please re-generate OTP again."}), 400
+                return jsonify({"status": "error", "message": "Please re-generate OTP again."}), 400
             else:
                 print("db_otp:-------",type(db_otp) , db_otp)
                 print("provided_otp:-------",type(provided_otp), provided_otp)
