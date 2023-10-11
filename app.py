@@ -370,15 +370,9 @@ def mobile_sendotp(data):
         response_data = {"status": "success", "message": "OTP sent successfully."}
         return response_data
 
-    except ValueError as ve:
-        logging.error(f"ValueError: {ve}")
-        print("Value Error in MobileOTP:---",ve)
-        response_data = {"status": "error", "message": str(ve)}
-        return response_data
-
     except Exception as e:
         logging.error(f"Exception: {e}")
-        response_data = {"status": "error", "message": "An unexpected error occurred."}
+        response_data = {"status": "error", "message": "Please try after some time."}
         return response_data
 
 
@@ -412,14 +406,9 @@ def email_sendotp1(data):
         response_data = {"status": "success", "message": "OTP sent successfully."}
         return response_data
 
-    except ValueError as ve:
-        logging.error(f"ValueError: {ve}")
-        response_data = {"status": "error", "message": str(ve)}
-        return response_data
-
     except Exception as e:
         logging.error(f"Exception: {e}")
-        response_data = {"status": "error", "message": "An unexpected error occurred."}
+        response_data = {"status": "error", "message": "Please try after some time."}
         return response_data
 
 def signup_with_credentials(data):
@@ -455,7 +444,7 @@ def signup_with_credentials(data):
 
     except Exception as e:
         logging.error(f"Exception: {e}")
-        response_data = {"status": "error", "message": "An unexpected error occurred."}
+        response_data = {"status": "error", "message": "Please try after some time."}
         return response_data
 
 def email_exists(email):
@@ -534,7 +523,7 @@ def regenerate_mail_otp():
 	
 	except Exception as e:
 		logging.error(f"Exception: {e}")
-		response_data = {"status": "error", "message": "An unexpected error occurred."}
+		response_data = {"status": "error", "message": "Please try after some time."}
 		return response_data
 
 
@@ -602,7 +591,7 @@ def otp_verification():
 
     except Exception as e:
         logging.error(f"Exception: {e}")
-        return jsonify({"status": "error", "message": "An unexpected error occurred."}), 500
+        return jsonify({"status": "error", "message": "Please try after some time."}), 500
         
 
 
@@ -661,7 +650,7 @@ def email_otp_verification():
 
 	except Exception as e:
 		logging.error(f"Exception: {e}")
-		return jsonify({"status": "error", "message": "An unexpected error occurred."}), 500
+		return jsonify({"status": "error", "message": "Please try after some time."}), 500
         
 
 ############################ API for forget/Reset password ############################
@@ -747,7 +736,7 @@ def change_forgot_password():
 	
 	except Exception as e:
 		logging.error(f"Exception: {e}")
-		return jsonify({"status": "error", "message": "An unexpected error occurred."}), 500
+		return jsonify({"status": "error", "message": "Please try after some time."}), 500
 
 
 def is_valid_password(password):
