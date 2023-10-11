@@ -639,16 +639,20 @@ def otp_verification():
 def email_otp_verification():
 	try:
 		#print("data:---------",request.json.get())
-		data = request.json.get('email')
-		print("data:---------",data)
-		email1 = data['email']
-		print("email1:---------",email1)
+
 		try:
+			data = request.json.get('email')
+			print("data:---------",data)
+			email1 = data['email']
+			print("email1:---------",email1)
 			email = email1["email"]
 		except Exception as e:
+			data = request.json.get()
+			email1 = data['email']
 			print("in save_custmr_1:-----",e)
 			email = email1
-		print("EMAIL ID:-----------------",email)
+			print("EMAIL ID:-----------------",email)
+			
 		provided_otp = int(request.json.get('provided_otp'))
 		cursor.execute("SELECT email_otp, email_otp_status, email_otp_generated_date_time FROM public.login_details WHERE email = %s", (email,))
 		record = cursor.fetchone()
