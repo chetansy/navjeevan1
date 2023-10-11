@@ -1124,33 +1124,37 @@ def generate_pdf():
     
 @app.route('/get_score', methods=['POST'])
 def get_score():
-    #try:
-    data = request.get_json()
-    email1 = data['email']
-    print("email1:---------",email1)
-    if email1 == str():
-        email = email1
-    else:
-        email = email1["email"]
-    print("email:-----------",email)
-    ### Extracting customer_id from email ###
-    cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
-    data = cursor.fetchone()
-    customer_id = str(data[0])
-    print("customer_id:-----------",customer_id)
-    #insert_query = """SELECT neo_score,eligible_amount FROM eligibility_details WHERE customer_id = %s"""
-    #values = (customer_id)
-    cursor.execute("SELECT neo_score,eligible_amount FROM eligibility_details WHERE customer_id = %s", (customer_id,))
-    #cur.execute("SELECT neo_score,eligible_amount FROM eligibility_details WHERE customer_id = %s",[customer_id])
-    #cursor.execute(insert_query, values)
-    neo = cursor.fetchone()
-    neo_scor = neo[0]
-    eligibl_scor = neo[1]
-    conn.commit()
-    print("neo_score:----",neo_scor)
-    return jsonify({"neo_scor": str(neo_scor), "eligibl_scor":str(eligibl_scor)})
+    try:
+	    data = request.get_json()
+	    email1 = data['email']
+	    print("email1:---------",email1)
+	    if email1 == str():
+	        email = email1
+	    else:
+	        email = email1["email"]
+	    print("email:-----------",email)
+	    ### Extracting customer_id from email ###
+	    cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
+	    data = cursor.fetchone()
+	    customer_id = str(data[0])
+	    print("customer_id:-----------",customer_id)
+	    #insert_query = """SELECT neo_score,eligible_amount FROM eligibility_details WHERE customer_id = %s"""
+	    #values = (customer_id)
+	    cursor.execute("SELECT neo_score,eligible_amount FROM eligibility_details WHERE customer_id = %s", (customer_id,))
+	    #cur.execute("SELECT neo_score,eligible_amount FROM eligibility_details WHERE customer_id = %s",[customer_id])
+	    #cursor.execute(insert_query, values)
+	    neo = cursor.fetchone()
+	    neo_scor = neo[0]
+	    eligibl_scor = neo[1]
+	    conn.commit()
+	    print("neo_score:----",neo_scor)
+	    return jsonify({"neo_scor": str(neo_scor), "eligibl_scor":str(eligibl_scor)})
     
-    
+	except Exception as e:
+		logging.error(f"Exception: {e}")
+		conn.rollback()  # Rollback changes to the database
+		error_response = {"status":"error","message": "Please try after some time."}
+		return jsonify(error_response), 500
     
     
 if __name__ == '__main__':  
