@@ -1128,10 +1128,9 @@ def get_score():
     data = request.get_json()
     email1 = data['email']
     print("email1:---------",email1)
-    try:
+    if email1["email"] is not None:
         email = email1["email"]
-    except Exception as e:
-        print("in save_custmr_1:-----",e)
+    else:
         email = email1
     print("email:-----------",email)
     ### Extracting customer_id from email ###
