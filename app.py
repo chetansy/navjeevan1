@@ -93,9 +93,9 @@ def get_neo_score(email):
 	print("Email:-----------",email)
 	cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
 	
-	data = cursor.fetchone()
-	print("data:--------------",data[0])
-	customer_id = data[0]
+	data1 = cursor.fetchone()
+	print("data:--------------",data1[0])
+	customer_id = data1[0]
 	# Query data from the customer_details and eligibility_details tables
 	cursor.execute('SELECT * FROM customer_details WHERE customer_id = %s', (customer_id,))
 	df_customer = pd.DataFrame(cursor.fetchall(), columns=[desc[0] for desc in cursor.description])
@@ -180,9 +180,9 @@ def get_eligible_amount(email):
     
     cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
     
-    data = cursor.fetchone()
-    print("data:--------------",data[0])
-    customer_id = data[0]
+    data1 = cursor.fetchone()
+    print("data:--------------",data1[0])
+    customer_id = data1[0]
     # Query data from the customer_details and eligibility_details tables
     cursor.execute('SELECT * FROM customer_details WHERE customer_id = %s', (customer_id,))
     df_customer = pd.DataFrame(cursor.fetchall(), columns=[desc[0] for desc in cursor.description])
@@ -664,9 +664,9 @@ def change_forgot_password():
 			if re.match(password_pattern, new_password) is None:                            # Returns None
 				return jsonify({"status": "error", "message": "Password should contain At least 1 uppercase ,1 Lowercase, 1 digit, 1 special character"}) 	
 			cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
-			data = cursor.fetchone()
-			print("data:----", data[0])
-			customer_id = data[0]
+			data1 = cursor.fetchone()
+			print("data:----", data1[0])
+			customer_id = data1[0]
 			print("customer_id:-----------",customer_id)
 			
 			
@@ -772,9 +772,9 @@ def otp_change_forgot_password():
 def retrieve():
         email = request.args['email']
         cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
-        data = cursor.fetchone()
-        print("data:----", data[0])
-        customer_id = data[0]
+        data1 = cursor.fetchone()
+        print("data:----", data1[0])
+        customer_id = data1[0]
         try:
             cursor.execute("SELECT pan,designation,average_monthly_income, average_monthly_expense FROM customer_details WHERE customer_id = %s", (customer_id,))
             already_details = cursor.fetchone()
@@ -863,8 +863,8 @@ def save_customer_details2():
 		print("email:-----------",email)
 		### Extracting customer_id from email ###
 		cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
-		data = cursor.fetchone()
-		customer_id = data[0]
+		data1 = cursor.fetchone()
+		customer_id = data1[0]
 		print("customer_id:-----------",customer_id)
 		
 		existing_emi  = data['existing_emi']
@@ -993,8 +993,8 @@ def generate_pdf():
 			cursor = conn.cursor()
 			
 			cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
-			data = cursor.fetchone()
-			customer_id = data[0]
+			data1 = cursor.fetchone()
+			customer_id = data1[0]
 			print("customer_id:-----------",customer_id)
 			
 			
@@ -1135,8 +1135,8 @@ def get_score():
 		print("email:-----------",email)
 		### Extracting customer_id from email ###
 		cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
-		data = cursor.fetchone()
-		customer_id = str(data[0])
+		data1 = cursor.fetchone()
+		customer_id = str(data1[0])
 		print("customer_id:-----------",customer_id)
 		
 		cursor.execute("SELECT neo_score,eligible_amount FROM eligibility_details WHERE customer_id = %s", (customer_id,))
