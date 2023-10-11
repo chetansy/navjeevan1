@@ -299,14 +299,15 @@ def login():
 @app.route('/signup', methods=['POST'])
 
 def signup():
-	request_data = request.json
-	data = request.get_json()
-	
-	if data.get('email') is None or data.get('mobile') is None or data.get('name') is None or data.get('password') is None:
-		print({"message": "Each field need to be filled"})
-		return jsonify({"message": "Each field need to be filled"}), 400
-	else:
-		try:
+	try:
+		request_data = request.json
+		data = request.get_json()
+		
+		if data.get('email') is None or data.get('mobile') is None or data.get('name') is None or data.get('password') is None:
+			print({"message": "Each field need to be filled"})
+			return jsonify({"message": "Each field need to be filled"}), 400
+		else:
+		
 			regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')  
 			
 			email = request_data.get('email')
@@ -317,9 +318,8 @@ def signup():
 			if re.match(password_pattern, password) is None:                            # Returns None
 				return jsonify({"status": "error", "message": "Password should contain At least 1 uppercase ,1 Lowercase, 1 digit, 1 special character"}) 
 			if re.fullmatch(regex, email):  
-				print("The given mail is valid")  
 				if mobile and len(str(mobile)) == 10:
-					print("The mobile is valid")
+					
 					# Check if email or mobile already exists in the database
 					if email_exists(email):
 						return jsonify({"message": "Email already exists"}), 400
@@ -337,16 +337,18 @@ def signup():
 							
 							#print("getting email:----")
 							email_sendotp1(request_data)
-					
-					return jsonify(signup_result)
+						
+						return jsonify(signup_result)
 				else:
 					return jsonify({"status": "error", "message": "Invalid mobile number provided."})
 			else:  
 				print("The given mail is invalid")  
 				return jsonify({"status": "error", "message": "The given mail is invalid."})
-		except Exception as e:
-			print("ERROR_Ssingup:----",e)
-			return jsonify({"status": "error", "message": "Please try after some time."})
+		
+	except Exception as e:
+		print("Error_singup:----",e)
+		return jsonify({"status": "error", "message": "Please try after some time."})
+
 
 def mobile_sendotp(data):
     print("mobile:----",data.get('mobile'))
