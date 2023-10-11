@@ -820,7 +820,7 @@ def save_customer_details1():
 			#print("pan:----" ,pan)
 			#print("occupation:----" ,occupation)
 			#print("monthly_income:----" ,monthly_income)
-			#print("monthly_expenses:----" ,monthly_expenses)
+			print("monthly_expenses:----" ,monthly_expenses)
 			
 			insert_query = """UPDATE public.customer_details SET pan = %s, designation = %s,average_monthly_income = %s,average_monthly_expense = %s WHERE customer_id = %s"""
 			values = (
