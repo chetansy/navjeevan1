@@ -645,7 +645,7 @@ def email_otp_verification():
 			print("data:---------",data)
 			email1 = data['email']
 			print("email1:---------",email1)
-			email = email1["email"]
+			email = email1
 		except Exception as e:
 			data = request.json.get()
 			email1 = data['email']
