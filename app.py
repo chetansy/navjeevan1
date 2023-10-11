@@ -596,12 +596,6 @@ def email_otp_verification():
 		except Exception as e:
 			data = request.json.get()
 
-		if request.json.get('email') is None:	
-			data = request.json.get('email')
-			print("data:---------",data)
-		else:
-			data = request.json.get()
-			print("in data1:-----",data)
 		email = data['email']
 		print("email:---------",email)
 		
