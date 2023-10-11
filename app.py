@@ -804,13 +804,13 @@ def save_customer_details1():
 			### Extracting customer_id from email ###
 			cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
 			data = cursor.fetchone()
-			print("data:----", data[0])
+			print("data:----", data[0],type(data[0]))
 			customer_id = data[0]
 			
 			if customer_id is None:
 				return jsonify({"status": "error","message": "Customer ID not found "}), 400
 			
-			app.logger.debug(f"customer_id: {customer_id}")
+			#app.logger.debug(f"customer_id: {customer_id}")
 			pan = data['pan']
 			occupation = data['occupation']
 			monthly_income  = data['monthly_income']
