@@ -638,7 +638,7 @@ def otp_verification():
 @app.route('/email_otp_verification', methods=['POST'])
 def email_otp_verification():
 	try:
-		print("data:---------",request.json.get())
+		#print("data:---------",request.json.get())
 		data = request.json.get('email')
 		print("data:---------",data)
 		email1 = data['email']
