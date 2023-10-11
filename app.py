@@ -244,50 +244,54 @@ def get_eligible_amount(email):
 ############################ API for login page############################
 @app.route('/login', methods=['POST'])
 def login():
-    
-    data = request.get_json()
+    try:
+	    data = request.get_json()
+	
+	    if data.get('email') is None or data.get('password') is None:
+	        print({"message": "Email and password cannot be None"})
+	        return jsonify({"message": "Email and password cannot be None"}), 400
+	    else:
+	        email = request.json['email']
+	        password = request.json['password']
+	        print("email:----",email)
+	        #print("password:----------",password)
+	        
+	        
+	        cursor.execute("SELECT password, last_password_change,email_otp_status FROM login_details WHERE email = %s", (email,))
+	        user_data = cursor.fetchone()
+	    
+	        if user_data:
+	            _hashed_password, last_password_change,email_otp_status = user_data
+	            print("email_otp_status:------",email_otp_status)
+	            if email_otp_status != "SUCCESS":
+	                return jsonify({'message': 'Kindly Verify account before login'}), 500
+	            
+	            current_date = datetime.now()
+	            if last_password_change is None:
+	                return jsonify({'message': 'Last Password change date not found'}), 500
+	    
+	            expiration_date = last_password_change + timedelta(days=PASSWORD_EXPIRY_DAYS)
+	            if current_date > expiration_date:
+	                return jsonify({'message': 'Your password has expired. Please change your password.'}), 401
+	    
+	            if check_password_hash(_hashed_password, password):
+	                # Reset login attempts on successful login
+	                
+	                return jsonify({'message': 'Login successful'}), 200
+	            else:
+	                # Increment login attempts
+	                #session['login_attempts'] = session.get('login_attempts', 0) + 1
+	                # Check if maximum login attempts reached
+	                #if session['login_attempts'] >= MAX_LOGIN_ATTEMPTS:
+	                #    return jsonify({'message': 'Maximum login attempts exceeded. Please try again later.'}), 401        
+	                #else:
+	                    return jsonify({'message': 'Invalid password'}), 401
+	        else:
+	            return jsonify({'message':'User not found'}), 404
 
-    if data.get('email') is None or data.get('password') is None:
-        print({"message": "Email and password cannot be None"})
-        return jsonify({"message": "Email and password cannot be None"}), 400
-    else:
-        email = request.json['email']
-        password = request.json['password']
-        print("email:----",email)
-        #print("password:----------",password)
-        
-        
-        cursor.execute("SELECT password, last_password_change,email_otp_status FROM login_details WHERE email = %s", (email,))
-        user_data = cursor.fetchone()
-    
-        if user_data:
-            _hashed_password, last_password_change,email_otp_status = user_data
-            print("email_otp_status:------",email_otp_status)
-            if email_otp_status != "SUCCESS":
-                return jsonify({'message': 'Kindly Verify account before login'}), 500
-            
-            current_date = datetime.now()
-            if last_password_change is None:
-                return jsonify({'message': 'Last Password change date not found'}), 500
-    
-            expiration_date = last_password_change + timedelta(days=PASSWORD_EXPIRY_DAYS)
-            if current_date > expiration_date:
-                return jsonify({'message': 'Your password has expired. Please change your password.'}), 401
-    
-            if check_password_hash(_hashed_password, password):
-                # Reset login attempts on successful login
-                
-                return jsonify({'message': 'Login successful'}), 200
-            else:
-                # Increment login attempts
-                #session['login_attempts'] = session.get('login_attempts', 0) + 1
-                # Check if maximum login attempts reached
-                #if session['login_attempts'] >= MAX_LOGIN_ATTEMPTS:
-                #    return jsonify({'message': 'Maximum login attempts exceeded. Please try again later.'}), 401        
-                #else:
-                    return jsonify({'message': 'Invalid password'}), 401
-        else:
-            return jsonify({'message':'User not found'}), 404
+	except Exception as e:
+		print("Error in Login:----",e)
+		return jsonify({"status": "error", "message": "Please try after some time."})
 
 
 
