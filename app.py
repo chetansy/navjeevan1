@@ -791,7 +791,7 @@ def retrieve():
 @app.route('/save_customer_details1', methods=['POST'])
 def save_customer_details1():
 	
-	#try:
+	try:
 		data = request.get_json()
 		
 		if data.get('pan') is None or data.get('occupation') is None or data.get('monthly_income') is None or data.get('monthly_expenses') is None:
@@ -803,9 +803,9 @@ def save_customer_details1():
 			email = data['email']
 			### Extracting customer_id from email ###
 			cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
-			data = cursor.fetchone()
-			print("data:----", data[0],type(data[0]))
-			customer_id = data[0]
+			data1 = cursor.fetchone()
+			print("data:----", data1[0],type(data1[0]))
+			customer_id = data1[0]
 			
 			if customer_id is None:
 				return jsonify({"status": "error","message": "Customer ID not found "}), 400
@@ -820,7 +820,7 @@ def save_customer_details1():
 			#print("pan:----" ,pan)
 			#print("occupation:----" ,occupation)
 			#print("monthly_income:----" ,monthly_income)
-			print("monthly_expenses:----" ,monthly_expenses)
+			#print("monthly_expenses:----" ,monthly_expenses)
 			
 			insert_query = """UPDATE public.customer_details SET pan = %s, designation = %s,average_monthly_income = %s,average_monthly_expense = %s WHERE customer_id = %s"""
 			values = (
@@ -834,11 +834,11 @@ def save_customer_details1():
 			
 			return jsonify(response), 200
 	
-	#except Exception as e:
+	except Exception as e:
 		#logging.error(f"Exception: {e}")
-		#conn.rollback()  # Rollback changes to the database
-		#error_response = {"status":"error","message": "Please try after some time."}
-		#return jsonify(error_response), 500
+		conn.rollback()  # Rollback changes to the database
+		error_response = {"status":"error","message": "Please try after some time."}
+		return jsonify(error_response), 500
     
 
         
