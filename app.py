@@ -437,7 +437,7 @@ def signup_with_credentials(data):
 
         except Exception as e:
             conn.rollback()  
-            response_data = {"status": "error", "message": str(e)}
+            response_data = {"status": "error", "message": "Please try after some time."}
             return response_data # Return JSON response with a status code
 
         print("Records inserted.....")
