@@ -7,6 +7,7 @@ form = cgi.FieldStorage()
 import urllib.request
 import urllib.parse
 from flask import Flask, request, session, redirect, url_for, render_template, flash, jsonify,send_file
+from flask_mail import Message
 import requests
 import psycopg2 
 import psycopg2.extras
@@ -27,6 +28,8 @@ import pickle
 import joblib
 from io import BytesIO
 import pickletools
+import urllib.request
+import urllib.parse
 
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
@@ -60,12 +63,6 @@ DB_USER = "navjeevan_data_user"
 DB_PASS = "263sRonJ5pLLli2OfSN6YzptaWucb2jb"
 DB_PORT = "5432"
 
-
-from flask_mail import Message
-from flask import render_template
-
-    
-
 conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST, port=DB_PORT)
 conn.autocommit = True
 cursor = conn.cursor()
@@ -75,24 +72,6 @@ MAX_LOGIN_ATTEMPTS = 3
 PASSWORD_MIN_LENGTH = 8
 PASSWORD_EXPIRY_DAYS = 90
 
-def get_customer_id_for_user(email):
-    try:
-        cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
-        customer_id = cursor.fetchone()
-        
-        if customer_id:
-            print("custmer_id_functn:---------",customer_id[0])
-            return customer_id[0]
-        else:
-            return None  # User not found
-
-    except Exception as e:
-        print(f"Error in get_customer_id_for_user: {e}")
-        return None
-
-
-import urllib.request
-import urllib.parse
 
 smsApiKey = "MmZhOTNmMWQ2MzNmMzI5MDEwNWQ1YjZjMjNmZjgwMDM="
 smsSenderId = "CRDSID"
@@ -279,10 +258,6 @@ def login():
         password = request.json['password']
         print("email:----",email)
         #print("password:----------",password)
-        
-        customer_id = get_customer_id_for_user(email) 
-        # Set the customer_id in the session
-        #session['customer_id'] = customer_id
         
         
         cursor.execute("SELECT password, last_password_change,email_otp_status FROM login_details WHERE email = %s", (email,))
