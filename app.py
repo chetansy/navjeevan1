@@ -1152,7 +1152,6 @@ def get_score():
     
 	except Exception as e:
 		logging.error(f"Exception: {e}")
-		conn.rollback()  # Rollback changes to the database
 		error_response = {"status":"error","message": "Please try after some time."}
 		return jsonify(error_response), 500
     
