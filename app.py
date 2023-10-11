@@ -1128,7 +1128,7 @@ def get_score():
 		data = request.get_json()
 		email1 = data['email']
 		print("email1:---------",email1)
-		if email1 == str():
+		if email1["email"] is None:
 			email = email1
 		else:
 			email = email1["email"]
