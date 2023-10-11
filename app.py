@@ -345,7 +345,7 @@ def signup():
 				return jsonify({"status": "error", "message": "The given mail is invalid."})
 		except Exception as e:
 			print("ERROR_Ssingup:----",e)
-			return jsonify({"status": "error", "message": e})
+			return jsonify({"status": "error", "message": "Please try after some time."})
 
 def mobile_sendotp(data):
     print("mobile:----",data.get('mobile'))
@@ -394,7 +394,7 @@ def email_sendotp1(data):
         )
         conn.commit()
         #msg = Message('OTP', sender='pallaviuike140@gmail.com', recipients=[email])
-        msg = Message("Send Mail Tutorial!",
+        msg = Message("Email OTP Verification !",
 		  sender="navjeevan.creditsiddhi@gmail.com",
 		  recipients=[email])
         
@@ -516,11 +516,6 @@ def regenerate_mail_otp():
 		response_data = {"status": "success", "message": "OTP sent successfully."}
 		return response_data
 	
-	except ValueError as ve:
-		logging.error(f"ValueError: {ve}")
-		response_data = {"status": "error", "message": str(ve)}
-		return response_data
-	
 	except Exception as e:
 		logging.error(f"Exception: {e}")
 		response_data = {"status": "error", "message": "Please try after some time."}
@@ -585,10 +580,6 @@ def otp_verification():
         else:
             return jsonify({"status": "error", "message": "OTP is Expired please re-generate otp again"}), 400
 
-    except ValueError as ve:
-        logging.error(f"ValueError: {ve}")
-        return jsonify({"status": "error", "message": str(ve)}), 400
-
     except Exception as e:
         logging.error(f"Exception: {e}")
         return jsonify({"status": "error", "message": "Please try after some time."}), 500
@@ -643,10 +634,6 @@ def email_otp_verification():
 					return jsonify({"status": "error", "message": "Invalid OTP provided."}), 400
 		else:
 			return jsonify({"status": "error", "message": "Please re-generate OTP again."}), 400
-	
-	except ValueError as ve:
-		logging.error(f"ValueError: {ve}")
-		return jsonify({"status": "error", "message": str(ve)}), 400
 
 	except Exception as e:
 		logging.error(f"Exception: {e}")
@@ -730,9 +717,6 @@ def change_forgot_password():
 				#raise ValueError("Invalid Email")
 				return jsonify({"status": "error", "message": "Invalid Email ID."})
 	
-	except ValueError as ve:
-		logging.error(f"ValueError: {ve}")
-		return jsonify({"status": "error", "message": str(ve)}), 400
 	
 	except Exception as e:
 		logging.error(f"Exception: {e}")
@@ -856,7 +840,7 @@ def save_customer_details1():
 	except Exception as e:
 		logging.error(f"Exception: {e}")
 		conn.rollback()  # Rollback changes to the database
-		error_response = {"error": str(e)}
+		error_response = {"status":"error","message": "Please try after some time."}
 		return jsonify(error_response), 500
     
 
