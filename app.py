@@ -1128,7 +1128,7 @@ def get_score():
 		data = request.get_json()
 		email1 = data['email']
 		print("email1:---------",email1)
-		if email1["email"] is None:
+		if email1 != {}:
 			email = email1
 		else:
 			email = email1["email"]
@@ -1138,11 +1138,8 @@ def get_score():
 		data = cursor.fetchone()
 		customer_id = str(data[0])
 		print("customer_id:-----------",customer_id)
-		#insert_query = """SELECT neo_score,eligible_amount FROM eligibility_details WHERE customer_id = %s"""
-		#values = (customer_id)
+		
 		cursor.execute("SELECT neo_score,eligible_amount FROM eligibility_details WHERE customer_id = %s", (customer_id,))
-		#cur.execute("SELECT neo_score,eligible_amount FROM eligibility_details WHERE customer_id = %s",[customer_id])
-		#cursor.execute(insert_query, values)
 		neo = cursor.fetchone()
 		neo_scor = neo[0]
 		eligibl_scor = neo[1]
