@@ -53,7 +53,7 @@ logging.basicConfig(level=logging.INFO)
 
 app.config['SESSION_TYPE'] = 'filesystem'
 
-
+#### Online Databse configuration details
 DB_HOST = "dpg-ck5a6oeru70s739qi8ug-a"
 DB_NAME = "navjeevan_data"
 DB_USER = "navjeevan_data_user"
@@ -278,11 +278,11 @@ def login():
         email = request.json['email']
         password = request.json['password']
         print("email:----",email)
-        print("password:----------",password)
+        #print("password:----------",password)
         
         customer_id = get_customer_id_for_user(email) 
         # Set the customer_id in the session
-        session['customer_id'] = customer_id
+        #session['customer_id'] = customer_id
         
         
         cursor.execute("SELECT password, last_password_change,email_otp_status FROM login_details WHERE email = %s", (email,))
@@ -304,16 +304,16 @@ def login():
     
             if check_password_hash(_hashed_password, password):
                 # Reset login attempts on successful login
-                session['login_attempts'] = 0
+                #session['login_attempts'] = 0
                 return jsonify({'message': 'Login successful'}), 200
-            else:
+            #else:
                 # Increment login attempts
-                session['login_attempts'] = session.get('login_attempts', 0) + 1
+                #session['login_attempts'] = session.get('login_attempts', 0) + 1
                 # Check if maximum login attempts reached
-                if session['login_attempts'] >= MAX_LOGIN_ATTEMPTS:
-                    return jsonify({'message': 'Maximum login attempts exceeded. Please try again later.'}), 401        
-                else:
-                    return jsonify({'message': 'Invalid password'}), 401
+                #if session['login_attempts'] >= MAX_LOGIN_ATTEMPTS:
+                #    return jsonify({'message': 'Maximum login attempts exceeded. Please try again later.'}), 401        
+                #else:
+                #    return jsonify({'message': 'Invalid password'}), 401
         else:
             return jsonify({'message':'User not found'}), 404
 
@@ -354,12 +354,12 @@ def signup():
 					signup_result = signup_with_credentials(request_data)
 					print("signup_result:------------",signup_result['message'])
 					if signup_result['message'] == "User signup successfully" :
-						print("Yes:---------")
+						#print("Yes:---------")
 						if request_data['mobile'] and request_data['email']:
 							print("getting mobile:----",request_data['email'])
-							mobile_sendotp(request_data)
+							#mobile_sendotp(request_data)
 							
-							print("getting email:----")
+							#print("getting email:----")
 							email_sendotp1(request_data)
 					
 					return jsonify(signup_result)
@@ -469,7 +469,7 @@ def signup_with_credentials(data):
             current_date = datetime.now()
             cursor.execute("INSERT INTO login_details (name, email, mobile, password, last_password_change) VALUES (%s, %s, %s, %s, %s)", (name, email.lower(), mobile, _hashed_password, current_date))
             conn.commit()
-            session['customer_id'] = get_customer_id_for_user(email)
+            #session['customer_id'] = get_customer_id_for_user(email)
             response_data = {"message": "User signup successfully"}
             return response_data  # Return JSON response with a status code
 
@@ -670,8 +670,8 @@ def email_otp_verification():
 				conn.commit()
 				return jsonify({"status": "error", "message": "Please re-generate OTP again."}), 400
 			else:
-				print("db_otp:-------",type(db_otp) , db_otp)
-				print("provided_otp:-------",type(provided_otp), provided_otp)
+				#print("db_otp:-------",type(db_otp) , db_otp)
+				#print("provided_otp:-------",type(provided_otp), provided_otp)
 				if provided_otp == db_otp:
 					cursor.execute("UPDATE public.login_details SET email_otp_status = 'SUCCESS' WHERE email = %s", (email,))
 					conn.commit()
@@ -708,10 +708,10 @@ def change_forgot_password():
 			email = request.json.get("email")
 			new_password = request.json.get("new_password")
 			confirm_password = request.json.get("confirm_pass")
-			print("mobile:------------",type(mobile),mobile)
-			print("email:------------",email)
-			print("new_password:------------",new_password)
-			print("confirm_password:------------",confirm_password)
+			#print("mobile:------------",type(mobile),mobile)
+			#print("email:------------",email)
+			##print("new_password:------------",new_password)
+			#print("confirm_password:------------",confirm_password)
 			
 			password = request_data.get('password')
 			
@@ -734,7 +734,7 @@ def change_forgot_password():
 			if not account:
 				#raise ValueError("Invalid mobile number")
 				return jsonify({"status": "error", "message": "Invalid email number."})
-			print("account:------------",type(account[0]),account[0])
+			#print("account:------------",type(account[0]),account[0])
 			db_email = account[0]
 			
 			cursor.execute('SELECT mobile FROM public.login_details WHERE mobile = %s', (mobile,))
@@ -866,7 +866,7 @@ def save_customer_details1():
 			customer_id = custo_id[0]
 			
 			if customer_id is None:
-				return jsonify({"status": "error","message": "Customer ID not found in session"}), 400
+				return jsonify({"status": "error","message": "Customer ID not found "}), 400
 			
 			app.logger.debug(f"customer_id: {customer_id}")
 			pan = data['pan']
@@ -874,11 +874,11 @@ def save_customer_details1():
 			monthly_income  = data['monthly_income']
 			monthly_expenses  = data['monthly_expenses']
 			
-			print("customer_id:----" ,customer_id)
-			print("pan:----" ,pan)
-			print("occupation:----" ,occupation)
-			print("monthly_income:----" ,monthly_income)
-			print("monthly_expenses:----" ,monthly_expenses)
+			#print("customer_id:----" ,customer_id)
+			#print("pan:----" ,pan)
+			#print("occupation:----" ,occupation)
+			#print("monthly_income:----" ,monthly_income)
+			#print("monthly_expenses:----" ,monthly_expenses)
 			
 			insert_query = """UPDATE public.customer_details SET pan = %s, designation = %s,average_monthly_income = %s,average_monthly_expense = %s WHERE customer_id = %s"""
 			values = (
@@ -932,12 +932,12 @@ def save_customer_details2():
 		type_of_credit  = data['type_of_credit']
 		required_credit_amount  = int(data['required_credit_amount'])
 		
-		print("existing_emi:-----",existing_emi)
-		print("emi_amount:-----",emi_amount)
-		print("industry:-----",industry)
-		print("age_of_business:-----",age_of_business)
-		print("type_of_credit:-----",type_of_credit)
-		print("required_credit_amount:-----",required_credit_amount)
+		#print("existing_emi:-----",existing_emi)
+		#print("emi_amount:-----",emi_amount)
+		#print("industry:-----",industry)
+		#print("age_of_business:-----",age_of_business)
+		#print("type_of_credit:-----",type_of_credit)
+		#print("required_credit_amount:-----",required_credit_amount)
 		
 		
 		insert_query = """UPDATE customer_details SET existing_emi = %s, emi_amount = %s, industry = %s, age_of_business = %s, type_of_credit = %s, required_credit_amount = %s WHERE customer_id = %s"""
