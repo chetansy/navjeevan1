@@ -99,21 +99,21 @@ def get_neo_score(email):
 	# Query data from the customer_details and eligibility_details tables
 	cursor.execute('SELECT * FROM customer_details WHERE customer_id = %s', (customer_id,))
 	df_customer = pd.DataFrame(cursor.fetchall(), columns=[desc[0] for desc in cursor.description])
-	print("test1")
+	#print("test1")
 	
 	cursor.execute('SELECT cibil_score FROM eligibility_details WHERE customer_id = %s', (customer_id,))
 	df_eligibility = pd.DataFrame(cursor.fetchall(), columns=['cibil_score'])
-	print("test2")
+	#print("test2")
 	
 	# Combine the data into a single DataFrame
 	df = pd.concat([df_customer, df_eligibility], axis=1)
 	df.fillna(0,inplace=True)
 	print(df)
-	print("test3")
+	#print("test3")
 	
 	# Drop unnecessary columns
 	df.drop(columns=['customer_id', 'pan', 'pan_status','required_credit_amount'], inplace=True)
-	print("test4")
+	#print("test4")
 	
 	# Loading later
 	with open('https://github.com/chetansy/navjeevan1/neo_score_model_and_transformers2.pkl', 'rb') as f:
@@ -140,7 +140,7 @@ def get_neo_score(email):
 	
 	# Define the categorical columns
 	categorical_columns = ['designation', 'existing_emi', 'type_of_credit', 'industry']
-	print("categorical_columns:------")
+	#print("categorical_columns:------")
 	new_data = df
 	
 	# Apply one-hot encoding using the same encoder
@@ -161,7 +161,7 @@ def get_neo_score(email):
 	# Change the datatype to int32
 	#df = df.astype(np.int32)
 	#print(df)
-	print("test6")
+	#print("test6")
 	
 	
 	# Apply the model to the DataFrame
@@ -176,7 +176,7 @@ def get_neo_score(email):
 def get_eligible_amount(email):
     
     customer_id = request.json.get('customer_id')
-    print("test0")
+    #print("test0")
     
     cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
     
@@ -186,20 +186,20 @@ def get_eligible_amount(email):
     # Query data from the customer_details and eligibility_details tables
     cursor.execute('SELECT * FROM customer_details WHERE customer_id = %s', (customer_id,))
     df_customer = pd.DataFrame(cursor.fetchall(), columns=[desc[0] for desc in cursor.description])
-    print("test1")
+    #print("test1")
     
     cursor.execute('SELECT cibil_score,neo_score FROM eligibility_details WHERE customer_id = %s', (customer_id,))
     df_eligibility = pd.DataFrame(cursor.fetchall(), columns=['cibil_score','neo_score'])
-    print("test2")
+    #print("test2")
 
     # Combine the data into a single DataFrame
     df = pd.concat([df_customer, df_eligibility], axis=1)
     #print(df)
-    print("test3")
+    #print("test3")
 
     # Drop unnecessary columns
     df.drop(columns=['customer_id', 'pan', 'pan_status','required_credit_amount'], inplace=True)
-    print("test4")
+    #print("test4")
     
    # Loading later
     with open('neo_score/eligible_amount_model_and_transformers1.pkl', 'rb') as f:
@@ -211,11 +211,8 @@ def get_eligible_amount(email):
         
     # Define the categorical columns
     categorical_columns = ['designation', 'existing_emi', 'type_of_credit', 'industry']
-
     new_data = df
-    
-    
-    
+
     # Apply one-hot encoding using the same encoder
     #encoder = OneHotEncoder()
     one_hot_encoded_new = encoder.transform(new_data[categorical_columns])
@@ -232,7 +229,7 @@ def get_eligible_amount(email):
     # Change the datatype to int32
     #df = df.astype(np.int32)
     #print(df)
-    print("test6")
+    #print("test6")
 
 
     # Apply the model to the DataFrame
