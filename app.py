@@ -1128,10 +1128,10 @@ def get_score():
     data = request.get_json()
     email1 = data['email']
     print("email1:---------",email1)
-    if email1["email"] is not None:
-        email = email1["email"]
-    else:
+    if email1 == str():
         email = email1
+    else:
+        email = email1["email"]
     print("email:-----------",email)
     ### Extracting customer_id from email ###
     cursor.execute("SELECT customer_id FROM login_details WHERE email = %s", (email,))
