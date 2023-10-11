@@ -594,12 +594,15 @@ def email_otp_verification():
 
 		try:
 			data = request.json.get('email')
-			print("data:---------",data)
-		
 		except Exception as e:
 			data = request.json.get()
+
+		if request.json.get('email') is None:	
+			data = request.json.get('email')
+			print("data:---------",data)
+		else:
+			data = request.json.get()
 			print("in data1:-----",data)
-				
 		email = data['email']
 		print("email:---------",email)
 		
@@ -732,43 +735,6 @@ def is_valid_password(password):
     ):
         return False
     return True
-
-############################ API for new OTP ############################
-@app.route('/otp_change_forgot_password', methods=['POST'])
-def otp_change_forgot_password():
-    
-    request_data = request.get_json()
-    # Check if required fields are missing
-    required_fields = ['email', 'mobile']
-    missing_fields = [field for field in required_fields if field not in request_data]
-   
-    if missing_fields:
- 	   return jsonify({"error": f"The following fields are missing: {', '.join(missing_fields)}"}), 400
-   
-    email = request.json.get("email")  
-    print(email)
-    mobile = request.json.get("mobile") 
-    print(mobile)
-    
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM login_details WHERE mobile = %s', (mobile,))
-    print("mobile details")
-    account = cursor.fetchone()
-    if account:
-            otp = randint(100000, 999999)
-            cursor = conn.cursor()
-            cursor.execute(
-                "UPDATE public.login_details "
-                "SET new_otp = %s "
-                "WHERE mobile = %s and email = %s", 
-                (otp, mobile, email)
-            )
-            conn.commit()        
-     
-            logging.info(f"OTP sent to mobile number: {mobile}")
-            return jsonify({"status": "success", "message": "OTP sent successfully."}), 200
-    else:
-        return "Invalid mobile number/emailId"
 
 ###======================= API Retrieval ===============================##
 @app.route('/retrieval', methods=['GET'])
