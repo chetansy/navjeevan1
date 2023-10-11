@@ -791,7 +791,7 @@ def retrieve():
 @app.route('/save_customer_details1', methods=['POST'])
 def save_customer_details1():
 	
-	try:
+	#try:
 		data = request.get_json()
 		
 		if data.get('pan') is None or data.get('occupation') is None or data.get('monthly_income') is None or data.get('monthly_expenses') is None:
@@ -834,11 +834,11 @@ def save_customer_details1():
 			
 			return jsonify(response), 200
 	
-	except Exception as e:
-		logging.error(f"Exception: {e}")
-		conn.rollback()  # Rollback changes to the database
-		error_response = {"status":"error","message": "Please try after some time."}
-		return jsonify(error_response), 500
+	#except Exception as e:
+		#logging.error(f"Exception: {e}")
+		#conn.rollback()  # Rollback changes to the database
+		#error_response = {"status":"error","message": "Please try after some time."}
+		#return jsonify(error_response), 500
     
 
         
