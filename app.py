@@ -279,7 +279,7 @@ def login():
     
             if check_password_hash(_hashed_password, password):
                 # Reset login attempts on successful login
-                #session['login_attempts'] = 0
+                
                 return jsonify({'message': 'Login successful'}), 200
             #else:
                 # Increment login attempts
@@ -351,7 +351,6 @@ def mobile_sendotp(data):
     print("mobile:----",data.get('mobile'))
     try:
         mobile = data.get('mobile')
-        #customer_id = session.get('customer_id')
         
         otp = randint(100000, 999999)
         print("OTP:----",otp)
@@ -388,7 +387,6 @@ def email_sendotp1(data):
     print("email:----",data.get('email'))
     try:
         email = data.get('email')
-        #customer_id = session.get('customer_id')
 
         if not email:
             raise ValueError("Invalid email address provided.")
@@ -444,7 +442,7 @@ def signup_with_credentials(data):
             current_date = datetime.now()
             cursor.execute("INSERT INTO login_details (name, email, mobile, password, last_password_change) VALUES (%s, %s, %s, %s, %s)", (name, email.lower(), mobile, _hashed_password, current_date))
             conn.commit()
-            #session['customer_id'] = get_customer_id_for_user(email)
+
             response_data = {"message": "User signup successfully"}
             return response_data  # Return JSON response with a status code
 
@@ -484,7 +482,7 @@ def is_valid_password(password):
 ########################### API for LOGOUT PAGE ####################################
 @app.route('/logout/')
 def logout():
-    session.clear()
+
     print("Logged out successfully!")
     return redirect(url_for('login'))
 
@@ -504,7 +502,6 @@ def regenerate_mail_otp():
 		except Exception as e:
 			print("in save_custmr_1:-----",e)
 			email = email1
-		#customer_id = session.get('customer_id')
 		
 		if not email:
 			raise ValueError("Invalid email address provided.")
@@ -635,7 +632,7 @@ def email_otp_verification():
 		
 		db_otp, otp_status, otp_generated_date_time= record
 		print("otp_status:-----------",otp_status)
-		customer_id = session.get('customer_id')
+		
 		if otp_status == "SENT":
 			current_time = datetime.now()
 			difference_in_minutes = (current_time - otp_generated_date_time).total_seconds() / 60
