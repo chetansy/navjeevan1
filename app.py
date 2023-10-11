@@ -281,14 +281,14 @@ def login():
                 # Reset login attempts on successful login
                 
                 return jsonify({'message': 'Login successful'}), 200
-            #else:
+            else:
                 # Increment login attempts
                 #session['login_attempts'] = session.get('login_attempts', 0) + 1
                 # Check if maximum login attempts reached
                 #if session['login_attempts'] >= MAX_LOGIN_ATTEMPTS:
                 #    return jsonify({'message': 'Maximum login attempts exceeded. Please try again later.'}), 401        
                 #else:
-                #    return jsonify({'message': 'Invalid password'}), 401
+                    return jsonify({'message': 'Invalid password'}), 401
         else:
             return jsonify({'message':'User not found'}), 404
 
