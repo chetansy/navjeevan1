@@ -485,6 +485,7 @@ def save_customer_details1():
 			pan = pan.upper()
 			_hashed_password = generate_password_hash(pan)
 			pan1 = _hashed_password
+			print("pan1:----" ,pan1)
 			#print("customer_id:----" ,customer_id)
 			#print("pan:----" ,pan)
 			#print("occupation:----" ,occupation)
