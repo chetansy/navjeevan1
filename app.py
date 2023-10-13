@@ -323,12 +323,12 @@ def email_otp_verification():
         #print("data:---------",request.json.get())
         
         data = request.json.get('email')
-        if data != {}:
-            email = data
+        if data == {}:
+            email = data['email']
         else:
-            email = data["email"]
-        print("email:---------",email)
-        		
+            email = data
+        print("email:---------", type(data), email , data)
+        
         provided_otp = int(request.json.get('provided_otp'))
         cursor.execute("SELECT email_otp, email_otp_status, email_otp_generated_date_time FROM public.login_details WHERE email = %s", (email,))
         record = cursor.fetchone()
