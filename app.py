@@ -588,53 +588,52 @@ def otp_verification():
 ################################ Verify OTP to Email API #################################
 @app.route('/email_otp_verification', methods=['POST'])
 def email_otp_verification():
-	try:
-		#print("data:---------",request.json.get())
-
-		try:
-			data = request.json.get('email')
-		except Exception as e:
-			data = request.json.get()
-
-		email = data['email']
-		print("email:---------",email)
-		
-		provided_otp = int(request.json.get('provided_otp'))
-		cursor.execute("SELECT email_otp, email_otp_status, email_otp_generated_date_time FROM public.login_details WHERE email = %s", (email,))
-		record = cursor.fetchone()
-		if not record:
-			#raise ValueError("Email not registered.")
-			return jsonify({"status": "error", "message": "Email not registered."}), 400
-		
-		db_otp, otp_status, otp_generated_date_time= record
-		print("otp_status:-----------",otp_status)
-		
-		if otp_status == "SENT":
-			current_time = datetime.now()
-			difference_in_minutes = (current_time - otp_generated_date_time).total_seconds() / 60
-			print("difference_in_minutes:-----------",difference_in_minutes)
-			if difference_in_minutes > 10:
-				cursor.execute("UPDATE public.login_details SET email_otp_status = 'EXPIRED' WHERE email = %s", (email,))
-				conn.commit()
-				return jsonify({"status": "error", "message": "Please re-generate OTP again."}), 400
-			else:
-				#print("db_otp:-------",type(db_otp) , db_otp)
-				#print("provided_otp:-------",type(provided_otp), provided_otp)
-				if provided_otp == db_otp:
-					cursor.execute("UPDATE public.login_details SET email_otp_status = 'SUCCESS' WHERE email = %s", (email,))
-					conn.commit()
-					return jsonify({"status": "success", "message": "OTP verification successful."}), 200
-				else:
-					cursor.execute("UPDATE public.login_details SET email_otp_status = 'FAILED' WHERE email = %s", (email,))
-					conn.commit()
-					return jsonify({"status": "error", "message": "Invalid OTP provided."}), 400
-		else:
-			return jsonify({"status": "error", "message": "Please re-generate OTP again."}), 400
-
-	except Exception as e:
-		logging.error(f"Exception: {e}")
-		return jsonify({"status": "error", "message": "Please try after some time."}), 500
+    try:
+        #print("data:---------",request.json.get())
         
+        data = request.json.get('email')
+        if data != {}:
+            email = data
+        else:
+            email = data["email"]
+        print("email:---------",email)
+        		
+        provided_otp = int(request.json.get('provided_otp'))
+        cursor.execute("SELECT email_otp, email_otp_status, email_otp_generated_date_time FROM public.login_details WHERE email = %s", (email,))
+        record = cursor.fetchone()
+        if not record:
+            #raise ValueError("Email not registered.")
+            return jsonify({"status": "error", "message": "Email not registered."}), 400
+        		
+        db_otp, otp_status, otp_generated_date_time= record
+        print("otp_status:-----------",otp_status)
+        		
+        if otp_status == "SENT":
+            current_time = datetime.now()
+            difference_in_minutes = (current_time - otp_generated_date_time).total_seconds() / 60
+            print("difference_in_minutes:-----------",difference_in_minutes)
+            if difference_in_minutes > 10:
+                cursor.execute("UPDATE public.login_details SET email_otp_status = 'EXPIRED' WHERE email = %s", (email,))
+                conn.commit()
+                return jsonify({"status": "error", "message": "Please re-generate OTP again."}), 400
+            else:
+                #print("db_otp:-------",type(db_otp) , db_otp)
+                #print("provided_otp:-------",type(provided_otp), provided_otp)
+                if provided_otp == db_otp:
+                    cursor.execute("UPDATE public.login_details SET email_otp_status = 'SUCCESS' WHERE email = %s", (email,))
+                    conn.commit()
+                    return jsonify({"status": "success", "message": "OTP verification successful."}), 200
+                else:
+                    cursor.execute("UPDATE public.login_details SET email_otp_status = 'FAILED' WHERE email = %s", (email,))
+                    conn.commit()
+                    return jsonify({"status": "error", "message": "Invalid OTP provided."}), 400
+        else:
+            return jsonify({"status": "error", "message": "Please re-generate OTP again."}), 400
+        
+    except Exception as e:
+        logging.error(f"Exception: {e}")
+        return jsonify({"status": "error", "message": "Please try after some time."}), 500
+
 
 ############################ API for forget/Reset password ############################
 @app.route('/change_forgot_password', methods=['POST'])
