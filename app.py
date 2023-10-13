@@ -327,7 +327,7 @@ def email_otp_verification():
             email = data['email']
         else:
             email = data
-        print("email:---------", type(data), email , data)
+        print("email:---------", type(data), email['email'] , data)
         
         provided_otp = int(request.json.get('provided_otp'))
         cursor.execute("SELECT email_otp, email_otp_status, email_otp_generated_date_time FROM public.login_details WHERE email = %s", (email,))
