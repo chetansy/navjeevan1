@@ -64,17 +64,17 @@ logging.basicConfig(level=logging.INFO)
 app.config['SESSION_TYPE'] = 'filesystem'
 
 #### Online Databse configuration details
-#DB_HOST = "dpg-ck5a6oeru70s739qi8ug-a"
-#DB_NAME = "navjeevan_data"
-#DB_USER = "navjeevan_data_user"
-#DB_PASS = "263sRonJ5pLLli2OfSN6YzptaWucb2jb"
-#DB_PORT = "5432"
-
-DB_HOST = "localhost"
+DB_HOST = "dpg-ck5a6oeru70s739qi8ug-a"
 DB_NAME = "navjeevan_data"
-DB_USER = "postgres"
-DB_PASS = "1234"
+DB_USER = "navjeevan_data_user"
+DB_PASS = "263sRonJ5pLLli2OfSN6YzptaWucb2jb"
 DB_PORT = "5432"
+
+#DB_HOST = "localhost"
+#DB_NAME = "navjeevan_data"
+#DB_USER = "postgres"
+#DB_PASS = "1234"
+#DB_PORT = "5432"
 
 conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST, port=DB_PORT)
 conn.autocommit = True
