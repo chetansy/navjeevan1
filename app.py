@@ -319,7 +319,7 @@ def otp_verification():
 ################################ Verify OTP to Email API #################################
 @app.route('/email_otp_verification', methods=['POST'])
 def email_otp_verification():
-    try:
+    #try:
         #print("data:---------",request.json.get())
         
         data = request.json.get('email')
@@ -361,9 +361,9 @@ def email_otp_verification():
         else:
             return jsonify({"status": "error", "message": "Please re-generate OTP again."}), 400
         
-    except Exception as e:
-        logging.error(f"Exception: {e}")
-        return jsonify({"status": "error", "message": "Please try after some time."}), 500
+    #except Exception as e:
+    #    logging.error(f"Exception: {e}")
+    #    return jsonify({"status": "error", "message": "Please try after some time."}), 500
             
 
 ############################ API for forget/Reset password ############################
