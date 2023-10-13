@@ -321,14 +321,15 @@ def otp_verification():
 def email_otp_verification():
 	#try:
 		#print("data:---------",request.json.get())
-		
 		data = request.json.get('email')
-		if data == dict():
-			email = data['email']
-			email = email['email']	
+		
+		email1 = data['email']
+		print("email1:---------",email1)
+		if email1 != {}:
+			email = email1
 		else:
-			email = data
-		print("email:---------", type(data), email['email'] , data)
+			email = email1["email"]
+		print("email:---------", type(data), email , data)
 		
 		provided_otp = int(request.json.get('provided_otp'))
 		cursor.execute("SELECT email_otp, email_otp_status, email_otp_generated_date_time FROM public.login_details WHERE email = %s", (email,))
