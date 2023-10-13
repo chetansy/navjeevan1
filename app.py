@@ -319,7 +319,7 @@ def otp_verification():
 ################################ Verify OTP to Email API #################################
 @app.route('/email_otp_verification', methods=['POST'])
 def email_otp_verification():
-	#try:
+	try:
 		#print("data:---------",request.json.get())
 		data = request.json.get('email')
 		
@@ -363,9 +363,9 @@ def email_otp_verification():
 		else:
 			return jsonify({"status": "error", "message": "Please re-generate OTP again."}), 400
 	
-	#except Exception as e:
-	#    logging.error(f"Exception: {e}")
-	#    return jsonify({"status": "error", "message": "Please try after some time."}), 500
+	except Exception as e:
+	    logging.error(f"Exception: {e}")
+	    return jsonify({"status": "error", "message": "Please try after some time."}), 500
             
 
 ############################ API for forget/Reset password ############################
@@ -482,7 +482,9 @@ def save_customer_details1():
 			occupation = data['occupation']
 			monthly_income  = data['monthly_income']
 			monthly_expenses  = data['monthly_expenses']
-			
+			pan = pan.upper()
+			_hashed_password = generate_password_hash(pan)
+			pan1 = _hashed_password
 			#print("customer_id:----" ,customer_id)
 			#print("pan:----" ,pan)
 			#print("occupation:----" ,occupation)
@@ -491,7 +493,7 @@ def save_customer_details1():
 			
 			insert_query = """UPDATE public.customer_details SET pan = %s, designation = %s,average_monthly_income = %s,average_monthly_expense = %s WHERE customer_id = %s"""
 			values = (
-			pan.upper(), occupation ,monthly_income, monthly_expenses,customer_id
+			pan1, occupation ,monthly_income, monthly_expenses,customer_id
 			)
 			
 			cursor.execute(insert_query, values)
@@ -500,7 +502,7 @@ def save_customer_details1():
 			response = {"status": "success","message": "Data saved successfully"}
 			
 			return jsonify(response), 200
-	
+		
 	except Exception as e:
 		#logging.error(f"Exception: {e}")
 		conn.rollback()  # Rollback changes to the database
