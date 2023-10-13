@@ -323,7 +323,7 @@ def email_otp_verification():
         #print("data:---------",request.json.get())
         
         data = request.json.get('email')
-        if data == {}:
+        if data == dict():
             email = data['email']
         else:
             email = data
